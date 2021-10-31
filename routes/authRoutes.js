@@ -7,6 +7,7 @@ const authRouter = express.Router();
  * @api {post} /users/register register a user
  */
 authRouter.post('/register', (req, res) => {
+    console.log('Test');
     console.log(req.body);
     const user = new User({
         name: req.body.name,
@@ -21,6 +22,8 @@ authRouter.post('/register', (req, res) => {
         });
     });
 });
+
+
 
 
 module.exports = authRouter;

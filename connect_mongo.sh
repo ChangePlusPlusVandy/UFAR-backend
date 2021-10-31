@@ -1,0 +1,1 @@
+mongosh "mongodb+srv://salomondush:sshl9qGVKNhNtTXq@cluster0.ztkdg.mongodb.net/ufar?retryWrites=true&w=majority" --authenticationDatabase "admin"

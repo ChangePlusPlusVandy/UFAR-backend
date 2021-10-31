@@ -11,7 +11,7 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    privileges: { // 0: nurse, 1: manager, 2: accessor (with access code)
+    privileges: { // 0: nurse, 1: manager, 2: accessor (with access code) 
         type: String,
         default: '0'
     },
