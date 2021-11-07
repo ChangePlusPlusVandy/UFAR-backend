@@ -32,18 +32,6 @@ const ReportSchema = new Schema({
         ref: 'Village'
     },
 
-    location: {
-        type: {
-            type: String,
-            enum: ['Point'],
-            required: true
-        },
-        coordinates: {
-            type: [Number],
-            required: true
-        }
-    },
-
     date : {
         type: Date,
         default: Date.now
