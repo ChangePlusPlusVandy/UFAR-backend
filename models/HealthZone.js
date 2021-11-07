@@ -12,11 +12,6 @@ const HealthZoneSchema = new Schema({
         default: Date.now
     },
 
-    patients: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Patient'
-    }], 
-
     is_verified: { // it's verified if all patients attached are verified
         type: Boolean,
         default: false
