@@ -372,6 +372,19 @@ const ReportSchema = new Schema({
     },
 
     // VI. DRUG management is done by the DRUG model
+
+
+    // VII.  VALIDATION AND KOBO
+    is_validated: {
+        type: Boolean,
+        default: false
+    },
+
+    sent_to_kobo: {
+        type: Boolean,
+        default: false
+    }
+
 });
 
 
