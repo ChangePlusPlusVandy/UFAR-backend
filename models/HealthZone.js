@@ -6,13 +6,18 @@ const HealthZoneSchema = new Schema({
         type: String,
         required: true
     },
+
+    health_areas: [{
+        type: Schema.Types.ObjectId,
+        ref: 'HealthArea'
+    }],
     
     created_at: {
         type: Date,
         default: Date.now
     },
 
-    is_verified: { // it's verified if all patients attached are verified
+    is_verified: { 
         type: Boolean,
         default: false
     },

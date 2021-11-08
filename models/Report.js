@@ -12,21 +12,6 @@ const ReportSchema = new Schema({
         ref: 'User'
     },
 
-    province: {
-        type: Schema.Types.ObjectId,
-        ref: 'Province'
-    },
-
-    district: {
-        type: Schema.Types.ObjectId,
-        ref: 'District'
-    },
-
-    health_area: {
-        type: Schema.Types.ObjectId,
-        ref: 'HealthZone'
-    },
-
     village: {
         type: Schema.Types.ObjectId,
         ref: 'Village'
@@ -386,6 +371,5 @@ const ReportSchema = new Schema({
     }
 
 });
-
 
 module.exports = mongoose.model('Report', ReportSchema);

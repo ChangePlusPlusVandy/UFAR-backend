@@ -11,9 +11,9 @@ const ProvinceSchema = new Schema({
         required: true
     },
     
-    districts: [{
+    health_zones: [{
         type: Schema.Types.ObjectId,
-        ref: 'District'
+        ref: 'HealthZone'
     }],
     
     created_at: {
