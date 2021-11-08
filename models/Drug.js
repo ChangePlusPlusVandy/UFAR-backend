@@ -37,8 +37,7 @@ const DrugSchema = new Schema({
         default: 0,
         required: true
     },
-
-    // create field qty_remaining that is the sum of qty_received - qty_used - qty_lost and calculates
+    
     qty_remaining: {
         type: Number,
         default: 0,

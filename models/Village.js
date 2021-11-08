@@ -18,8 +18,6 @@ const VillageSchema = Schema({
             required: true
         }
     },
-
-    // todo: connecting districts, healthzones, and provinces after tomorrow's meeting.
 })
 
 
