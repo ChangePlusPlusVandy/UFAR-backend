@@ -2,7 +2,7 @@ const express = require('express');
 const connectDB = require('./database/connection');
 const cors = require('cors');
 const authRouter = require('./routes/authRoutes');
-const patientRouter = require('./routes/patientActions');
+const formRouter = require('./routes/formActions');
 const testEndPoint = require('./routes/GetUsersTest');
 
 const PORT = process.env.PORT || 3001;
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
 
 // ROUTES
 app.use("/auth", authRouter);
-app.use("/patient", patientRouter);
+app.use("/form", formRouter);
 app.use("/test", testEndPoint)
 
 app.get('/', (req, res) => {

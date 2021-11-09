@@ -7,9 +7,11 @@ const ReportSchema = new Schema({
         type: String,
         required: true
     },
+
     nurse: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+        type: String, //for now, if we're not doing auth
+        //type: Schema.Types.ObjectId,
+        //ref: 'User'
     },
 
     village: {
@@ -24,36 +26,62 @@ const ReportSchema = new Schema({
 
     // todo: skipping the diseases treated for this section
     // teatment circles object with disease name and number of people treated
+    
+    /*
+
+    Commenting out for now - implementation w/ sub document will be easier I think
+
     treatment_circles: [{
-        disease: {
-            type: Schema.Types.ObjectId,
-            ref: 'Disease'
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'Disease',
+        default: []
+    }],
+
+    */
+
+    treatment_circles: [{
+        name: {
+            type: String,
+            required: true,
+        },
+    
+        number: {
+            type: Number,
+            default: 0,
+            required: true
+        },
+
+        default: []
     }],
 
     dcs_training_completion_date: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
 
     medicines_arrival_date: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
 
     MDD_start_date: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
 
     MDD_end_date: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
 
     date_of_transmission: {
         type: Date,
-        required: true
+        required: true,
+        default: Date.now
     },
 
     // distributors object with distributor name and number of people treated

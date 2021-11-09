@@ -1,0 +1,27 @@
+{
+    "DMM_day": "Day 1",
+    "nurse": "Nurse person",
+    "village": "Springfield",
+    "distributors": {
+        "men": 10,
+        "women": 10
+    },
+    "patients": {
+        "men": {
+            "lessThanSixMonth": 5,
+            "sixMonthsToFiveYears": 35,
+            "fiveToFourteen": 25,
+            "fifteenAndAbove": 15
+        },
+        "women": {
+            "lessThanSixMonth": 5,
+            "sixMonthsToFiveYears": 35,
+            "fiveToFourteen": 25,
+            "fifteenAndAbove": 15
+        }
+    },
+    "households": {
+        "visited": 50,
+        "treated": 40
+    }
+}

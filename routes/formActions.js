@@ -1,17 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Patient = require('../models/Patient');
+const functions = require('../database/functions');
 const router = express.Router();
 
 // TODO - Not much experience with endpoint stuff, not yet sure how authentication
 // will work. For now I'll just not worry about authentication
 
 /**
- * @api {post} /patient/register register a patient
+ * @api {post} /form/insert insert a form
  */
- router.post('/register', (req, res) => {
+ router.post('/insert', (req, res) => {
+     
     console.log("Register endpoint reached");
     console.log(req.body);
+    
+    functions(req, res);
+
+    /*
     const pat = new Patient({
         name: req.body.name,
         gender: req.body.gender,
@@ -31,6 +36,7 @@ const router = express.Router();
             message: err.message || "Some error occurred while creating the Patient."
         });
     });
+    */
 });
 
 module.exports = router;
