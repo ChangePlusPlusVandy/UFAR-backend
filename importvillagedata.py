@@ -37,7 +37,7 @@ provinces = db["Province"]
 provinces.delete_many({})
 health_zones.delete_many({})
 health_areas.delete_many({})
-provinces.delete_many({})
+villages.delete_many({})
 
 last_province_id = ""
 last_province = ""
