@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const Schema = mongoose.Schema;
 
 const VillageSchema = Schema({
@@ -6,7 +7,7 @@ const VillageSchema = Schema({
         type: String,
         required: true,
     },
-
+    /*
     location: {
         type: {
             type: String,
@@ -18,7 +19,7 @@ const VillageSchema = Schema({
             required: true
         }
     },
+    */
 })
-
 
 module.exports = mongoose.model("Village", VillageSchema);
