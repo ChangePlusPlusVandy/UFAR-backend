@@ -2,7 +2,7 @@ const express = require('express');
 const connectDB = require('./database/connection');
 const cors = require('cors');
 const authRouter = require('./routes/authRoutes');
-const formRouter = require('./routes/formActions');
+const formRouter = require('./routes/formRoutes');
 const testEndPoint = require('./routes/GetUsersTest');
 
 const PORT = process.env.PORT || 3001;
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
 // ROUTES
 app.use("/auth", authRouter);
 app.use("/form", formRouter);
-app.use("/test", testEndPoint)
+app.use("/test", testEndPoint);
 
 app.get('/', (req, res) => {
     res.send('Hello World, this is UFAR');
@@ -30,5 +30,4 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
-}
-);
+});
