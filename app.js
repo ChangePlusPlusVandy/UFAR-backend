@@ -2,7 +2,7 @@ const express = require('express');
 const connectDB = require('./database/connection');
 const cors = require('cors');
 const authRouter = require('./routes/authRoutes');
-const formRouter = require('./routes/formActions');
+const formRouter = require('./routes/formRoutes');
 const testEndPoint = require('./routes/GetUsersTest');
 
 const PORT = process.env.PORT || 3001;
