@@ -10,14 +10,16 @@ const functions = require('../database/functions');
  dataRouter.post('/locations', (req, res) => {
 
     // handle w/ helper
-    functions.getLocationData((result, err) => {
-        console.log("Location result received");
+    functions.getLocationData((err, result) => {
+        console.log("Location result received - " + err);
         if (err != null) {
             res.status(500).send({
                 message: err.message || "An error occured fetching location data."
             });
         } else {
-            res.status(200).send(result);
+            res.status(200).send({
+                "prrovinces": result
+            });
         }
     });
 });
