@@ -18,7 +18,7 @@ const functions = require('../database/functions');
             });
         } else {
             res.status(200).send({
-                "prrovinces": result
+                "provinces": result
             });
         }
     });
