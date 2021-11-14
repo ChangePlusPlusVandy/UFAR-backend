@@ -12,3 +12,6 @@ const HealthAreaSchema = new Schema({
         ref: 'Village'
     }]
 });
+
+
+module.exports = mongoose.model('HealthArea', HealthAreaSchema, 'HealthArea');

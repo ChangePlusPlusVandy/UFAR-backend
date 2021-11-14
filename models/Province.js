@@ -24,4 +24,4 @@ const ProvinceSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('Province', ProvinceSchema);
+module.exports = mongoose.model('Province', ProvinceSchema, 'Province');

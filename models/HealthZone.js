@@ -24,4 +24,4 @@ const HealthZoneSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('HealthZone', HealthZoneSchema);
+module.exports = mongoose.model('HealthZone', HealthZoneSchema, 'HealthZone');

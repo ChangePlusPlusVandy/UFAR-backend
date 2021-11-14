@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const addReport = require('../database/functions');
+const functions = require('../database/functions');
 const formRouter = express.Router();
 
 /**
@@ -8,14 +8,20 @@ const formRouter = express.Router();
  */
 formRouter.post('/insert', (req, res) => {
 
-    console.log("register endpoint reached");
+    console.log("insert form endpoint reached");
     console.log(req.body);
 
     // call helper function
-    addReport(req, res);
-
-    res.status(200).send({ 
-        message: "Form inserted"
+    functions.addReport(req, (err, result) => {
+        if (err == null) {
+            console.log("Saved " + formDoc.nurse);
+            res.send(result);
+        } else {
+            console.log("Error saving f: " + err);
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the Form."
+            });
+        }
     });
 });
 

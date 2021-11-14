@@ -22,4 +22,4 @@ const VillageSchema = Schema({
     */
 })
 
-module.exports = mongoose.model("Village", VillageSchema);
+module.exports = mongoose.model("Village", VillageSchema, 'Village');
