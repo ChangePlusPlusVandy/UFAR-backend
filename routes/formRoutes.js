@@ -17,15 +17,13 @@ formRouter.post('/insert', (req, res) => {
             console.log("Saved " + formDoc.nurse);
             res.send(result);
         } else {
-            console.log("Error saving f: " + err);
+            console.log("Error saving form: " + err);
             res.status(500).send({
                 message: err.message || "Some error occurred while creating the Form."
             });
         }
     });
 });
-
-
 
 
 module.exports = formRouter;

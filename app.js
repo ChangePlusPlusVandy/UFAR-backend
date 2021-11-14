@@ -19,7 +19,7 @@ app.use(express.json()); // for parsing json
 app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
 
 // ROUTES
-app.use("/auth", authRouter);
+//app.use("/auth", authRouter);
 app.use("/form", formRouter);
 app.use("/data", dataRouter);
 

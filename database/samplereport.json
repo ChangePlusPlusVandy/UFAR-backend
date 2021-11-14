@@ -1,7 +1,7 @@
 {
     "DMM_day": "Day 1",
     "nurse": "Nurse person",
-    "village": "Springfield",
+    "village": "618b21ed8453970bd9167662",
     "distributors": {
         "men": 10,
         "women": 10
@@ -23,5 +23,117 @@
     "households": {
         "visited": 50,
         "treated": 40
+    },
+
+
+
+
+
+
+
+
+    "treatment_circles": [
+        {
+            "name": "Example name", 
+            "number": 10
+        }
+    ],
+    "dcs_training_completion_date": "$currentDate",
+    "medicines_arrival_date": "$currentDate",
+    "MDD_start_date": "",
+    "MDD_end_date": "",
+    "date_of_transmission": "",
+    "blind": {
+        "men": 10,
+        "women": 15
+    },
+    "lymphedema": {
+        "men": {
+            "upper_limbs": {
+                "left": 4,
+                "right": 5
+            },
+            "lower_limbs": {
+                "left": 0,
+                "right": 1
+            }
+        },
+        "women": {
+            "upper_limbs": {
+                "left": 4,
+                "right": 5
+            },
+            "lower_limbs": {
+                "left": 0,
+                "right": 1
+            },
+            "breast": 5
+        }
+    }, 
+    "hydroceles": {
+        "men": 30
+    },
+    "trichiasis": {
+        "men": 2,
+        "women": 4
+    },
+    "guinea_worm": {
+        "men": 3,
+        "women": 8
+    },
+    "mectizan": {
+        "men": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        },
+        "women": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        }
+    },
+    "mectizan_and_albendazole": {
+        "men": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        },
+        "women": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        }
+    },
+    "albendazole": {
+        "men": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        },
+        "women": {
+            "fiveToFourteen": 5,
+            "fifteenAndOver": 14
+        }
+    },
+    "praziquantel": {
+        "men": {
+            "fiveToFourteen": 5
+        },
+        "women": {
+            "fiveToFourteen": 5
+        }
+    },
+    "albendazole_soil_transmitted": {
+        "men": {
+            "fiveToFourteen": 5
+        },
+        "women": {
+            "fiveToFourteen": 5
+        }
+    },
+    "side_effects_num": 10,
+    "untreated_persons": {
+        "childrenYoungerThanFive": 10,
+        "pregnantWomen": 0,
+        "breastfeedingWomen": 0,
+        "bedriddenPatients": 0,
+        "refusals": 10,
+        "absent": 0
     }
 }

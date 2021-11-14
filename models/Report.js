@@ -164,7 +164,7 @@ const ReportSchema = new Schema({
     lymphedema: {
         men: {
             upper_limbs: {
-                left: {
+                left: { //I think this is called an arm
                     type: Number,
                     default: 0,
                 },
@@ -254,7 +254,7 @@ const ReportSchema = new Schema({
             }
         },
 
-        wives: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
@@ -279,7 +279,7 @@ const ReportSchema = new Schema({
             }
         },
 
-        wives: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
@@ -304,7 +304,7 @@ const ReportSchema = new Schema({
             }
         },
 
-        wives: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
@@ -325,7 +325,7 @@ const ReportSchema = new Schema({
             },
         },
 
-        wives: {
+        men: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
@@ -342,7 +342,7 @@ const ReportSchema = new Schema({
             },
         },
 
-        wives: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
