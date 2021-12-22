@@ -19,6 +19,18 @@ const ReportSchema = new Schema({
         ref: 'Village'
     },
 
+    // This can be derived from village but caching it is easier for other queries
+    health_area: {
+        type: Schema.Types.ObjectId,
+        ref: 'HealthArea'
+    },
+
+    // This can be derived from village but caching it is easier for other queries
+    health_zone: {
+        type: Schema.Types.ObjectId,
+        ref: 'HealthZone'
+    },
+
     date : {
         type: Date,
         default: Date.now
