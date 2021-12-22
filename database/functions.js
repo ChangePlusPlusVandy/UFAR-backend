@@ -1,8 +1,6 @@
 Report = require('../models/Report');
 const Province = require('../models/Province');
-const HealthArea = require('../models/HealthArea');
-const HealthZone = require('../models/HealthZone');
-const Village = require('../models/Village');
+const Report = require('../models/Report');
 
 //TODO: Move to own files
 
@@ -57,4 +55,32 @@ const addReport = function(req, callback) {
     });
 }
 
-module.exports = { addReport, getLocationData };
+const validateReport = function(reportId, callback) {
+    Report.findByIdAndUpdate({reportId}, {"is_validated": true}, (err, result) => {
+        if (err != null) {
+            console.log("Error validating form " + reportId + ": " + err.message);
+            callback(null, err);
+        } else {
+            callback(result, null);
+        }
+    });
+}
+
+const validateHealthZoneReports = function(req, callback) {
+    let success = true;
+
+    for (let reportId in req.body) {
+        validateReport(reportId, (err, result) => {
+            if (err != null) {
+                callback(null, err);
+                success = false;
+            }
+        });
+    }
+    
+    if (success) {
+        callback(result, null);
+    }
+}
+
+module.exports = { addReport, getLocationData, validateHealthZoneReports };
