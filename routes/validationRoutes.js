@@ -3,9 +3,9 @@ const functions = require('../database/functions');
 const validationRouter = express.Router();
 
 /**
- * @api {post} /validation/health_zone/reports/validate validate list of reports from a health zone
+ * @api {post} /validation/<health_zone_id>/reports/validate validate list of reports from a health zone
  */
-validationRouter.post('/health_zone/reports/validate', (req, res) => {
+validationRouter.post('/:health_zone_id/reports/validate', (req, res) => {
     console.log("Validate forms from Health Zone endpoint reached");
     console.log(req.body);
 

@@ -67,9 +67,9 @@ const validateReport = function(reportId, callback) {
 }
 
 const validateHealthZoneReports = function(req, callback) {
+    const ids = req.body.reports;
     let success = true;
-
-    for (let reportId in req.body) {
+    for (let reportId in ids) {
         validateReport(reportId, (err, result) => {
             if (err != null) {
                 callback(null, err);
