@@ -31,6 +31,39 @@ const getLocationData = function(callback) {
     }).exec(callback);   
 }
 
+
+/**
+ * formats location data into a new easily searchable format for the front end
+ * @param {*} locationData 
+ * @returns Object with keys: provinces > health_zones > health_areas > villages
+ */
+const formatLocationData = function(locationData) {
+    var new_structure = {};
+    
+    locationData.forEach( (province) => {
+        new_structure[province.name] = {};
+        new_structure[province.name]['id'] = province._id;
+        new_structure[province.name]['health_zones'] = {};
+
+        province.health_zones.forEach( (health_zone) => {
+            new_structure[province.name]['health_zones'][health_zone.name] = {};
+            new_structure[province.name]['health_zones'][health_zone.name]['id'] = health_zone._id;
+            new_structure[province.name]['health_zones'][health_zone.name]['health_areas'] = {};
+
+            health_zone.health_areas.forEach( (health_area) => {
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name] = {};
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['id'] = health_area._id;
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'] = {};
+                health_area.villages.forEach( (village) => {
+                    new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'][village.name] = village._id;
+                });
+            });
+        });
+    });
+
+    return new_structure;
+}
+
 // https://www.bezkoder.com/mongoose-one-to-many-relationship/
 
 // implement helper functions that query the database
@@ -136,4 +169,4 @@ const getForms = function(health_zone_id, validation_status, callback) {
     */
 }
 
-module.exports = { addReport, getLocationData, getForms };
+module.exports = { addReport, getLocationData, getForms, formatLocationData };
