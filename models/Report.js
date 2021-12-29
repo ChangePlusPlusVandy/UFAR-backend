@@ -396,8 +396,63 @@ const ReportSchema = new Schema({
         },
     },
 
-    // VI. DRUG management is done by the DRUG model
+    // VI. DRUG MANAGEMENT
+    ivermectin_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
 
+    albendazole_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
+
+    praziquantel_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
 
     // VII.  VALIDATION AND KOBO
     is_validated: {
