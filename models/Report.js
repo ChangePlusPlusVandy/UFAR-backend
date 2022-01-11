@@ -36,35 +36,74 @@ const ReportSchema = new Schema({
         default: Date.now
     },
 
-    // todo: skipping the diseases treated for this section
-    // teatment circles object with disease name and number of people treated
-    
-    /*
-
-    Commenting out for now - implementation w/ sub document will be easier I think
-
-    treatment_circles: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Disease',
-        default: []
-    }],
-
-    */
-
-    treatment_circles: [{
-        name: {
-            type: String,
-            required: true,
+    // 1.11 diseases treated
+    onchocerciasis: {
+        first_round: {
+            type: Boolean,
+            default: false
         },
-    
-        number: {
+        second_round: {
+            type: Boolean,
+            default: false
+        },
+    },
+
+    lymphatic_filariasis: {
+        mectizan_and_albendazole: {
+            type: Boolean,
+            default: false
+        },
+        albendazole_alone: {
+            first_round: {
+                type: Boolean,
+                default: false
+            },
+            second_round: {
+                type: Boolean,
+                default: false
+            },
+        },
+    },
+
+    schistosomiasis: {
+        type: Boolean,
+        default: false
+    },
+
+    soil_transmitted_helminthiasis: {
+        type: Boolean,
+        default: false
+    },
+
+    trachoma: {
+        type: Boolean,
+        default: false
+    },
+
+    // 1.12 number of treatment cycles 
+
+    treatment_circles: {
+        onchocerciasis: {
             type: Number,
-            default: 0,
-            required: true
+            default: 0
         },
-
-        default: []
-    }],
+        lymphatic_filariasis: {
+            type: Number,
+            default: 0
+        },
+        schistosomiasis: {
+            type: Number,
+            default: 0
+        },
+        soil_transmitted_helminthiasis: {
+            type: Number,
+            default: 0
+        },
+        trachoma: {
+            type: Number,
+            default: 0
+        },
+    },
 
     dcs_training_completion_date: {
         type: Date,
@@ -337,7 +376,7 @@ const ReportSchema = new Schema({
             },
         },
 
-        men: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
@@ -396,7 +435,63 @@ const ReportSchema = new Schema({
         },
     },
 
-    // VI. DRUG management is done by the DRUG model
+    // VI. DRUG MANAGEMENT
+    ivermectin_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
+
+    albendazole_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
+
+    praziquantel_management: {
+        quantityReceived: {
+            type: Number,
+            default: 0
+        },
+        quantityUsed: {
+            type: Number,
+            default: 0
+        },
+        amountLost: {
+            type: Number,
+            default: 0
+        },
+        quantityReturnedToCS: {
+            type: Number,
+            default: 0
+        },        
+    },
 
 
     // VII.  VALIDATION AND KOBO
