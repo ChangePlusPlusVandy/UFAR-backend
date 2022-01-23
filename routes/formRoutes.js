@@ -15,7 +15,7 @@ formRouter.post('/insert', (req, res) => {
     functions.addReport(req, (result, err) => {
         if (err == null) {
             console.log("Saved " + result.nurse + "'s form");
-            res.send(result);
+            res.status(200).send(result);
         } else {
             console.log("Error saving form: " + err);
             res.status(500).send({
