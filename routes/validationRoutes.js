@@ -9,11 +9,7 @@ const validationRouter = express.Router();
  validationRouter.post('/:health_zone_id/reports', (req, res) => {
 
     var health_zone_id = req.params.health_zone_id;
-
     // good test 1 - 618b21eb8453970bd916764c
-
-    console.log("Received request for unvalidated reports from health_zone_id:");
-    console.log(health_zone_id);
 
     // call helper function
     functions.getForms(health_zone_id, "unvalidated", (err, result) => {

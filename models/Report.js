@@ -337,7 +337,7 @@ const ReportSchema = new Schema({
             },
         },
 
-        men: {
+        women: {
             fiveToFourteen: {
                 type: Number,
                 default: 0,
