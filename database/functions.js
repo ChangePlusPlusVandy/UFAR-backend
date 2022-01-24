@@ -249,7 +249,6 @@ const getDrugData = async function(health_zone_id, numPastDays) {
     }
 }
 
-module.exports = { addReport, getLocationData, getForms, getDrugData };
 const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
     var reports
@@ -363,4 +362,4 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     callback(finalResults, null);
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getTherapeuticCoverage };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage };
