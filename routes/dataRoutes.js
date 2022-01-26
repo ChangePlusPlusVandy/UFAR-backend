@@ -30,6 +30,7 @@ const dataRouter = express.Router();
 
     var health_zone_id = req.params.health_zone_id;
     // good test 1 - 618b21eb8453970bd916764c
+    // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function
     functions.getTherapeuticCoverage(health_zone_id, 30, (result, err) => {
