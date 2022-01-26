@@ -31,6 +31,39 @@ const getLocationData = function(callback) {
     }).exec(callback);   
 }
 
+
+/**
+ * formats location data into a new easily searchable format for the front end
+ * @param {*} locationData 
+ * @returns Object with keys: provinces > health_zones > health_areas > villages
+ */
+const formatLocationData = function(locationData) {
+    var new_structure = {};
+    
+    locationData.forEach( (province) => {
+        new_structure[province.name] = {};
+        new_structure[province.name]['id'] = province._id;
+        new_structure[province.name]['health_zones'] = {};
+
+        province.health_zones.forEach( (health_zone) => {
+            new_structure[province.name]['health_zones'][health_zone.name] = {};
+            new_structure[province.name]['health_zones'][health_zone.name]['id'] = health_zone._id;
+            new_structure[province.name]['health_zones'][health_zone.name]['health_areas'] = {};
+
+            health_zone.health_areas.forEach( (health_area) => {
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name] = {};
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['id'] = health_area._id;
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'] = {};
+                health_area.villages.forEach( (village) => {
+                    new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'][village.name] = village._id;
+                });
+            });
+        });
+    });
+
+    return new_structure;
+}
+
 // https://www.bezkoder.com/mongoose-one-to-many-relationship/
 
 // implement helper functions that query the database
@@ -140,6 +173,80 @@ const getForms = function(health_zone_id, validation_status, callback) {
 
     Report.find(findParams).exec(callback);   
     */
+}
+
+// helper function for the drug data dashboard
+const getDrugData = async function(health_zone_id, numPastDays) { 
+    try {
+        // drugData object will hold the drug data
+        const drugData = {};
+
+        // find health zone whose id is health_zone_id
+        const healthZone = await HealthZone.find({"_id": health_zone_id}).populate({
+            path: "health_areas"
+        }).exec();
+
+        // health zone with health_zone_id as its id does not exist
+        if (healthZone.length == 0) {
+            console.log("Could not find health zone with id " + health_zone_id);
+            return {result: drugData, error: null};
+        }
+
+        // calculate the earliest date from which to get data from
+        const earliestDate = new Date();
+        earliestDate.setDate(earliestDate.getDate() - numPastDays);
+
+        // iterate through every health area in the health zone
+        for (h in healthZone[0]["health_areas"]) {
+            let healthArea = healthZone[0]["health_areas"][h];
+
+            // make array of the id's of all the villages in a health area
+            const villages = [];
+            for (v in healthArea.villages) {
+                let villageId = healthArea.villages[v];
+                villages.push(mongoose.Types.ObjectId(villageId));
+            }
+
+            // find all reports that are for all the villages in the health area, are validated, and are from the past specified dates
+            const reports = await Report.find({ village: {$in: villages}, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
+
+            if (reports.length != 0) {
+                // these arrays hold the data about the drugs in the Drug Management section of a report
+                const drugsName = ["ivermectin", "albendazole", "praziquantel"];
+                const drugsUsed = [];
+                const drugsReceived = [];
+                
+                for (let i = 0; i < drugsName.length; i++) {
+                    drugsUsed.push(0);
+                    drugsReceived.push(0);
+                }
+
+                // get the drug data needed from each valid report
+                for (r in reports) {
+                    report = reports[r];
+                    for (let i = 0; i < drugsName.length; i++) {
+                        let drug_management = drugsName[i] + "_management";
+                        drugsUsed[i] += report[drug_management]["quantityUsed"];
+                        drugsReceived[i] += report[drug_management]["quantityReceived"];
+                    }
+                }
+
+                // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
+                drugData[healthArea.name] = {};
+                for (let i = 0; i < drugsName.length; i++) {
+                    let drugPercentage = Math.round(drugsUsed[i] / drugsReceived[i] * 100);
+                    drugData[healthArea.name][drugsName[i]] = drugPercentage;
+                }
+            }
+        }
+        
+        // returns the drug percentages for each drug and for each health area for the health zone with health_zone_id as its id
+        return {result: drugData, error: null};
+
+    } catch(err) {
+        // catch and return error, if any
+        return {result: null, error: err};
+    }
 }
 
 const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
@@ -255,4 +362,4 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     callback(finalResults, null);
 }
 
-module.exports = { addReport, getLocationData, getForms, getTherapeuticCoverage };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage };
