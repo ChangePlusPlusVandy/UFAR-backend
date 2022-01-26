@@ -49,13 +49,14 @@ const { formatLocationData } = require('../database/functions');
 });
 
 /**
- * @api {post} /health zone id/geographic_coverage - get geographic coverage stats for health zone
+ * @api {post} /data/health zone id/geographic_coverage - get geographic coverage stats for health zone
  */
  dataRouter.post('/:health_zone_id/geographic_coverage', (req, res) => {
 
     var health_zone_id = req.params.health_zone_id;
     console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
     // good test 1 - 618b21eb8453970bd916764c
+    // ex village 618b21ec8453970bd9167653
     // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function

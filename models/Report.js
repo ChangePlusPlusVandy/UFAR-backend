@@ -96,23 +96,23 @@ const ReportSchema = new Schema({
     diseases_treated: {
         onchocerciasis: {
             type: Number,
-            //default: 0
+            default: 0
         },
         lymphatic_filariasis: {
             type: Number,
-            //default: 0
+            default: 0
         },
         schistosomiasis: {
             type: Number,
-            //default: 0
+            default: 0
         },
         soil_transmitted_helminthiasis: {
             type: Number,
-            //default: 0
+            default: 0
         },
         trachoma: {
             type: Number,
-            //default: 0
+            default: 0
         },
     },
 
