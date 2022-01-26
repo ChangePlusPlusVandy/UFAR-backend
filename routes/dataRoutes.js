@@ -26,7 +26,7 @@ const { formatLocationData } = require('../database/functions');
 });
 
 /**
- * @api {post} /data/locations - get the full location list
+ * @api {post} /health zone id/therapeutic_coverage - get therapeutic coverage stats for health zone
  */
  dataRouter.post('/:health_zone_id/therapeutic_coverage', (req, res) => {
 
@@ -36,6 +36,30 @@ const { formatLocationData } = require('../database/functions');
 
     // call helper function
     functions.getTherapeuticCoverage(health_zone_id, 30, (result, err) => {
+        if (err == null) {
+            console.log("Found and returned " + result);
+            res.status(200).send(result);
+        } else {
+            console.log("Error getting forms for health zone: " + err.message + " " + result);
+            res.status(500).send({
+                message: err.message || "Some error occurred while receiving forms."
+            });
+        }
+    });
+});
+
+/**
+ * @api {post} /health zone id/geographic_coverage - get geographic coverage stats for health zone
+ */
+ dataRouter.post('/:health_zone_id/geographic_coverage', (req, res) => {
+
+    var health_zone_id = req.params.health_zone_id;
+    console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
+    // good test 1 - 618b21eb8453970bd916764c
+    // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
+
+    // call helper function
+    functions.getGeographicalCoverage(health_zone_id, 30, (result, err) => {
         if (err == null) {
             console.log("Found and returned " + result);
             res.status(200).send(result);

@@ -37,23 +37,14 @@ const ReportSchema = new Schema({
     },
 
     // 1.11 diseases treated
-    onchocerciasis: {
-        first_round: {
-            type: Boolean,
-            default: false
-        },
-        second_round: {
-            type: Boolean,
-            default: false
-        },
-    },
 
-    lymphatic_filariasis: {
-        mectizan_and_albendazole: {
-            type: Boolean,
-            default: false
-        },
-        albendazole_alone: {
+    /*
+    not needed, may as well be in next section
+
+    diseases_treated: [{
+        type: String,
+        /*
+        onchocerciasis: {
             first_round: {
                 type: Boolean,
                 default: false
@@ -63,45 +54,65 @@ const ReportSchema = new Schema({
                 default: false
             },
         },
-    },
+    
+        lymphatic_filariasis: {
+            mectizan_and_albendazole: {
+                type: Boolean,
+                default: false
+            },
+            albendazole_alone: {
+                first_round: {
+                    type: Boolean,
+                    default: false
+                },
+                second_round: {
+                    type: Boolean,
+                    default: false
+                },
+            },
+        },
+    
+        schistosomiasis: {
+            type: Boolean,
+            default: false
+        },
+    
+        soil_transmitted_helminthiasis: {
+            type: Boolean,
+            default: false
+        },
+    
+        trachoma: {
+            type: Boolean,
+            default: false
+        }
+        
+    }],
 
-    schistosomiasis: {
-        type: Boolean,
-        default: false
-    },
+    */
 
-    soil_transmitted_helminthiasis: {
-        type: Boolean,
-        default: false
-    },
+    // 1.11 & 1.12 number of treatment cycles 
 
-    trachoma: {
-        type: Boolean,
-        default: false
-    },
-
-    // 1.12 number of treatment cycles 
-
-    treatment_circles: {
+    diseases_treated: {
         onchocerciasis: {
             type: Number,
-            default: 0
+            //default: 0
         },
         lymphatic_filariasis: {
             type: Number,
-            default: 0
+            //default: 0
         },
         schistosomiasis: {
             type: Number,
-            default: 0
+            //default: 0
         },
         soil_transmitted_helminthiasis: {
             type: Number,
-            default: 0
+            //default: 0
         },
         trachoma: {
             type: Number,
-            default: 0
+            //default: 0
         },
     },
 

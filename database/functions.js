@@ -356,10 +356,78 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         finalResults["praziquantel"][area] += value["praziquantel"] / value["enumerated_persons"] 
     }
 
-    console.log("AAA");
-    console.log(finalResults);
-
     callback(finalResults, null);
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage };
+const getGeographicalCoverage = async function(health_zone_id, time, callback) {
+
+    var reports
+
+    try {
+        const current = new Date();
+        const prior = current.setDate(current.getDate() - time);
+
+        console.log(new Date(prior))
+
+        reports = await Report.find( {'health_zone': health_zone_id, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
+
+        console.log("Waiting for report " + reports.length);
+    } catch(err) {
+        callback(null, "Error getting villages from health zone: " + err);
+    }
+ 
+    /*
+    will store in form 
+ 
+    <healtharea>:
+        <treated_villages>: []
+        <untreated_villages>: []
+    */
+    const results = {}
+
+    for (rep of reports) {
+
+        var health_area = rep['health_area'];
+        var village = rep['village'];
+
+        var diseases = rep['diseases_treated'];
+        var treated = diseases['onchocerciasis'] > 0 ||
+                    diseases['lymphatic_filariasis'] > 0 ||
+                    diseases['schistosomiasis'] > 0 ||
+                    diseases['soil_transmitted_helminthiasis'] > 0 ||
+                    diseases['trachoma'] > 0;
+
+        console.log("Report found with vill " + village + " and treated status " + treated);
+
+        if (!(health_area in results)) {
+            results[health_area] = {
+                "treated_villages": [],
+                "untreated_villages": []
+            }
+        }
+
+        if (village in results[health_area]["treated_villages"]) continue;
+        if (treated) {
+            results[health_area]["treated_villages"].push(village);
+
+            // remove from untreated
+            const index = results[health_area]["untreated_villages"].indexOf(village)
+            if (index > -1) results.splice(index, 1); // remove from untreated
+        } else {
+            if (!(village in results[health_area]["untreated_villages"])) {
+                results[health_area]["untreated_villages"].push(village);
+            }
+        }
+    }
+
+    const finalResults = {}
+
+    // go through each health area and compute percent treated
+    for (const [area, value] of Object.entries(results)) {
+        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length)
+    }
+
+    callback({"village_coverage": finalResults}, null);
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage };

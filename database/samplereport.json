@@ -24,12 +24,10 @@
         "visited": 50,
         "treated": 40
     },
-    "treatment_circles": [
-        {
-            "name": "Example name", 
-            "number": 10
-        }
-    ],
+    "diseases_treated": {
+        "onchocerciasis": 10,
+        "COMMENT": "ONLY INCLUDE IF THE DISEASE IS ACTUALLY TREATED (>0)" 
+    },
     "dcs_training_completion_date": "<INSERT DATE>",
     "medicines_arrival_date": "<INSERT DATE>",
     "MDD_start_date": "<INSERT DATE>",
