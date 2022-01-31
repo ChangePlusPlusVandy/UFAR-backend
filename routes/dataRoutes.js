@@ -4,10 +4,12 @@ const dataRouter = express.Router();
 
 const functions = require('../database/functions');
 
+const { formatLocationData } = require('../database/functions');
+
 /**
  * @api {post} /data/locations - get the full location list
  */
-dataRouter.post('/locations', (req, res) => {
+dataRouter.get('/locations', (req, res) => {
 
     // handle w/ helper
     functions.getLocationData((err, result) => {
@@ -18,7 +20,7 @@ dataRouter.post('/locations', (req, res) => {
             });
         } else {
             res.status(200).send({
-                "provinces": result
+                "provinces": formatLocationData(result)
             });
         }
     });

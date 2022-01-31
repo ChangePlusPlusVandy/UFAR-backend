@@ -31,6 +31,39 @@ const getLocationData = function(callback) {
     }).exec(callback);   
 }
 
+
+/**
+ * formats location data into a new easily searchable format for the front end
+ * @param {*} locationData 
+ * @returns Object with keys: provinces > health_zones > health_areas > villages
+ */
+const formatLocationData = function(locationData) {
+    var new_structure = {};
+    
+    locationData.forEach( (province) => {
+        new_structure[province.name] = {};
+        new_structure[province.name]['id'] = province._id;
+        new_structure[province.name]['health_zones'] = {};
+
+        province.health_zones.forEach( (health_zone) => {
+            new_structure[province.name]['health_zones'][health_zone.name] = {};
+            new_structure[province.name]['health_zones'][health_zone.name]['id'] = health_zone._id;
+            new_structure[province.name]['health_zones'][health_zone.name]['health_areas'] = {};
+
+            health_zone.health_areas.forEach( (health_area) => {
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name] = {};
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['id'] = health_area._id;
+                new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'] = {};
+                health_area.villages.forEach( (village) => {
+                    new_structure[province.name]['health_zones'][health_zone.name]['health_areas'][health_area.name]['villages'][village.name] = village._id;
+                });
+            });
+        });
+    });
+
+    return new_structure;
+}
+
 // https://www.bezkoder.com/mongoose-one-to-many-relationship/
 
 // implement helper functions that query the database
@@ -43,6 +76,20 @@ const addReport = function(req, callback) {
     if (rawBody.village instanceof String) {
         // We must replace it with mongo object id type
         rawBody.village = mongoose.Types.ObjectId(rawBody.village);
+    }
+
+    if ('health_area' in rawBody) {
+        if (rawBody.health_area instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.health_area = mongoose.Types.ObjectId(rawBody.health_area);
+        }   
+    }
+
+    if ('health_zone' in rawBody) {
+        if (rawBody.health_zone instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
+        }  
     }
 
     var formDoc = new Report(req.body);
@@ -82,4 +129,68 @@ const validateHealthZoneReports = async function(reports) {
     }
 }
 
-module.exports = { addReport, getLocationData, validateHealthZoneReports };
+/**
+ * 
+ * @param {*} health_zone_id The health zone the forms belong to
+ * @param {*} validation_status "validated", "unvalidated", or "" depending on what types of forms are desired
+ * @param {*} callback The callback to send to once the request has been completed (error or not)
+ */
+const getForms = function(health_zone_id, validation_status, callback) {
+
+    // first we get the healthzone's villages
+    HealthZone.find({'_id': health_zone_id}).populate({
+        path: 'health_areas',
+    //    populate: {               We just need village object id so no need to populate
+    //        path: 'villages',
+    //        model: 'Village'
+    //    }
+    }).exec((err, result) => {
+        if (err == null) {
+            villages = [];
+
+            if (result.length == 0) {
+                callback({
+                    message: "Could not find health zone with id " + health_zone_id
+                }, {});
+                return;
+            }
+
+            for (ha in result[0]['health_areas']) {
+                area = result[0]['health_areas'][ha];
+                for (vil in area.villages) {
+                    villageId = area.villages[vil];
+                    villages.push(mongoose.Types.ObjectId(villageId)); //make it mongo id
+                }
+            }
+
+            var findParams = {
+                village: {"$in": villages}
+            };
+        
+            if (validation_status == "validated") findParams['is_validated'] = true;
+            if (validation_status == "unvalidated") findParams['is_validated'] = false;
+        
+            Report.find(findParams).exec(callback);   
+        } else {
+            callback("Error getting villages from health zone: " + err, result);
+        }
+    });   
+
+
+
+
+    /*
+    Code if we're storing health zone and health area in report (best search performance):
+
+    var findParams = {
+        health_zone: health_zone_id,
+    };
+
+    if (validation_status == "validated") findParams.push({'is_validated': true});
+    if (validation_status == "unvalidated") findParams.push({'is_validated': false});
+
+    Report.find(findParams).exec(callback);   
+    */
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, validateHealthZoneReports };
