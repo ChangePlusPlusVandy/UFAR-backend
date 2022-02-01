@@ -19,6 +19,11 @@ const ReportSchema = new Schema({
         ref: 'Village'
     },
 
+    province: {
+        type: Schema.Types.ObjectId,
+        ref: 'Province'
+    },
+
     // This can be derived from village but caching it is easier for other queries
     health_area: {
         type: Schema.Types.ObjectId,
@@ -33,7 +38,7 @@ const ReportSchema = new Schema({
 
     date : {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
 
     // 1.11 diseases treated
@@ -81,58 +86,58 @@ const ReportSchema = new Schema({
     },
 
     // 1.12 number of treatment cycles 
-
-    treatment_circles: {
-        onchocerciasis: {
-            type: Number,
-            default: 0
-        },
-        lymphatic_filariasis: {
-            type: Number,
-            default: 0
-        },
-        schistosomiasis: {
-            type: Number,
-            default: 0
-        },
-        soil_transmitted_helminthiasis: {
-            type: Number,
-            default: 0
-        },
-        trachoma: {
-            type: Number,
-            default: 0
-        },
-    },
+    // todo: embeded within 1.11
+    // treatment_circles: {
+    //     onchocerciasis: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    //     lymphatic_filariasis: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    //     schistosomiasis: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    //     soil_transmitted_helminthiasis: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    //     trachoma: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    // },
 
     dcs_training_completion_date: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 
     medicines_arrival_date: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 
     MDD_start_date: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 
     MDD_end_date: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 
     date_of_transmission: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 
     // distributors object with distributor name and number of people treated
@@ -257,8 +262,14 @@ const ReportSchema = new Schema({
                 }
             },
             breast: {
-                type: Number,
-                default: 0,
+                left: {
+                    type: Number,
+                    default: 0,
+                },
+                right: {
+                    type: Number,
+                    default: 0,
+                }
             }
         }
     },

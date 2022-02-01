@@ -8,9 +8,6 @@ const formRouter = express.Router();
  */
 formRouter.post('/insert', (req, res) => {
 
-    console.log("insert form endpoint reached");
-    console.log(req.body);
-
     // call helper function
     functions.addReport(req, (err, result) => {
         if (err == null) {

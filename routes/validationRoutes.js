@@ -6,7 +6,7 @@ const validationRouter = express.Router();
 /**
  * @api {post} /validation/<health_zone_id>/reports
  */
- validationRouter.post('/:health_zone_id/reports', (req, res) => {
+ validationRouter.get('/:health_zone_id/reports', (req, res) => {
 
     var health_zone_id = req.params.health_zone_id;
 
@@ -19,9 +19,7 @@ const validationRouter = express.Router();
     functions.getForms(health_zone_id, "unvalidated", (err, result) => {
         if (err == null) {
             console.log("Found and returned " + result.length + " forms");
-            res.status(200).send({
-                "reports": result
-            });
+            res.status(200).send(result);
         } else {
             console.log("Error getting forms for health zone: " + err);
             res.status(500).send({
