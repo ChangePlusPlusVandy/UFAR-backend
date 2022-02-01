@@ -9,9 +9,9 @@ const formRouter = express.Router();
 formRouter.post('/insert', (req, res) => {
 
     // call helper function
-    functions.addReport(req, (err, result) => {
+    functions.addReport(req, (result, err) => {
         if (err == null) {
-            console.log("Saved ");
+            console.log("Saved " + result.nurse + "'s form");
             res.status(200).send(result);
         } else {
             console.log("Error saving form: " + err);

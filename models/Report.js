@@ -42,6 +42,8 @@ const ReportSchema = new Schema({
     },
 
     // 1.11 diseases treated
+
+    // not needed, may as well be in next section
     onchocerciasis: {
         first_round: {
             type: Boolean,
@@ -52,7 +54,7 @@ const ReportSchema = new Schema({
             default: false
         },
     },
-
+    
     lymphatic_filariasis: {
         mectizan_and_albendazole: {
             type: Boolean,
@@ -503,7 +505,6 @@ const ReportSchema = new Schema({
             default: 0
         },        
     },
-
 
     // VII.  VALIDATION AND KOBO
     is_validated: {

@@ -24,25 +24,14 @@
         "visited": 50,
         "treated": 40
     },
-
-
-
-
-
-
-
-
-    "treatment_circles": [
-        {
-            "name": "Example name", 
-            "number": 10
-        }
-    ],
-    "dcs_training_completion_date": "$currentDate",
-    "medicines_arrival_date": "$currentDate",
-    "MDD_start_date": "",
-    "MDD_end_date": "",
-    "date_of_transmission": "",
+    "diseases_treated": {
+        "onchocerciasis": 10
+    },
+    "dcs_training_completion_date": "<INSERT DATE>",
+    "medicines_arrival_date": "<INSERT DATE>",
+    "MDD_start_date": "<INSERT DATE>",
+    "MDD_end_date": "<INSERT DATE>",
+    "date_of_transmission": "<INSERT DATE>",
     "blind": {
         "men": 10,
         "women": 15
@@ -93,21 +82,21 @@
     },
     "mectizan_and_albendazole": {
         "men": {
-            "fiveToFourteen": 5,
-            "fifteenAndOver": 14
+            "fiveToFourteen": 1,
+            "fifteenAndOver": 35
         },
         "women": {
-            "fiveToFourteen": 5,
-            "fifteenAndOver": 14
+            "fiveToFourteen": 8,
+            "fifteenAndOver": 23
         }
     },
     "albendazole": {
         "men": {
             "fiveToFourteen": 5,
-            "fifteenAndOver": 14
+            "fifteenAndOver": 21
         },
         "women": {
-            "fiveToFourteen": 5,
+            "fiveToFourteen": 6,
             "fifteenAndOver": 14
         }
     },
@@ -116,7 +105,7 @@
             "fiveToFourteen": 5
         },
         "women": {
-            "fiveToFourteen": 5
+            "fiveToFourteen": 45
         }
     },
     "albendazole_soil_transmitted": {
