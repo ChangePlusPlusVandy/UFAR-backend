@@ -8,7 +8,7 @@ const { formatLocationData } = require('../database/functions');
 /**
  * @api {post} /data/locations - get the full location list
  */
- dataRouter.get('/locations', (req, res) => {
+dataRouter.get('/locations', (req, res) => {
 
     // handle w/ helper
     functions.getLocationData((err, result) => {

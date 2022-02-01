@@ -16,11 +16,6 @@ const HealthZoneSchema = new Schema({
         type: Date,
         default: Date.now
     },
-
-    is_verified: { 
-        type: Boolean,
-        default: false
-    },
 });
 
 

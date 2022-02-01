@@ -4,12 +4,9 @@ const functions = require('../database/functions');
 const formRouter = express.Router();
 
 /**
- * @api {post} /form/insert insert a formt
+ * @api {post} /form/insert insert a form
  */
 formRouter.post('/insert', (req, res) => {
-
-    console.log("insert form endpoint reached");
-    console.log(req.body);
 
     // call helper function
     functions.addReport(req, (result, err) => {

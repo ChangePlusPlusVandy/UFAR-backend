@@ -78,6 +78,20 @@ const addReport = async function(req, callback) {
         rawBody.village = mongoose.Types.ObjectId(rawBody.village);
     }
 
+    if ('province' in rawBody) {
+        if (rawBody.province instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.province = mongoose.Types.ObjectId(rawBody.province);
+        }
+    }
+
+    if ('health_zone' in rawBody) {
+        if (rawBody.health_zone instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
+        }
+    }
+
     if ('health_area' in rawBody) {
         if (rawBody.health_area instanceof String) {
             // We must replace it with mongo object id type
@@ -89,15 +103,11 @@ const addReport = async function(req, callback) {
         rawBody.health_area = ha['_id']
     }
 
-    if ('health_zone' in rawBody) {
-        if (rawBody.health_zone instanceof String) {
+    if ('village' in rawBody) {
+        if (rawBody.village instanceof String) {
             // We must replace it with mongo object id type
-            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
-        }  
-    } else {
-        // We must find health zone if they didn't provide it
-        var hz = await HealthZone.findOne({'health_areas': {'$in': rawBody.health_area}}).exec();
-        rawBody.health_zone = hz['_id']
+            rawBody.village = mongoose.Types.ObjectId(rawBody.village);
+        }
     }
 
     var formDoc = new Report(req.body);
@@ -106,12 +116,35 @@ const addReport = async function(req, callback) {
 
     //todo come bck to this
     formDoc.save().then(result => {
-        console.log("Successfully saved form.");
-        callback(result, null);
+        callback(null, result);
     }).catch(err => {
-        console.log("Error occurred saving form: " + err.message);
-        callback(null, err);
+        console.log("Error saving form: " + err.message);
+        callback(err, null);
     });
+}
+
+const validateHealthZoneReports = async function(reports) {
+
+    try {
+        
+        const updatedReports = [];
+
+        for (const report of reports) {
+            const id = mongoose.Types.ObjectId(report._id);
+            delete report._id;
+
+            const updatedReport = await Report.findByIdAndUpdate(id, {...report}, {new: true});
+
+            updatedReports.push(updatedReport);
+        }
+
+        return {result: updatedReports, error: null};
+
+    } catch (err) {
+
+        return {result: null, error: err};
+
+    }
 }
 
 /**
@@ -123,16 +156,9 @@ const addReport = async function(req, callback) {
 const getForms = function(health_zone_id, validation_status, callback) {
 
     // first we get the healthzone's villages
-    HealthZone.find({'_id': health_zone_id}).populate({
-        path: 'health_areas',
-    //    populate: {               We just need village object id so no need to populate
-    //        path: 'villages',
-    //        model: 'Village'
-    //    }
-    }).exec((err, result) => {
-        if (err == null) {
-            villages = [];
+    HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
 
+        if (err == null) {
             if (result.length == 0) {
                 callback({
                     message: "Could not find health zone with id " + health_zone_id
@@ -140,16 +166,8 @@ const getForms = function(health_zone_id, validation_status, callback) {
                 return;
             }
 
-            for (ha in result[0]['health_areas']) {
-                area = result[0]['health_areas'][ha];
-                for (vil in area.villages) {
-                    villageId = area.villages[vil];
-                    villages.push(mongoose.Types.ObjectId(villageId)); //make it mongo id
-                }
-            }
-
             var findParams = {
-                village: {"$in": villages}
+                "health_zone": result._id
             };
         
             if (validation_status == "validated") findParams['is_validated'] = true;
