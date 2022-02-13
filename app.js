@@ -1,7 +1,7 @@
 const express = require('express');
 const connectDB = require('./database/connection');
 const cors = require('cors');
-//const authRouter = require('./routes/authRoutes');
+const authRouter = require('./routes/authRoutes');
 const formRouter = require('./routes/formRoutes');
 const dataRouter = require('./routes/dataRoutes');
 const validationRouter = require('./routes/validationRoutes');
@@ -20,7 +20,7 @@ app.use(express.json()); // for parsing json
 app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
 
 // ROUTES
-//app.use("/auth", authRouter);
+app.use("/auth", authRouter);
 app.use("/form", formRouter);
 app.use("/data", dataRouter);
 app.use("/validation", validationRouter);

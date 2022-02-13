@@ -7,13 +7,9 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    email: {
+    role: { // 0: nurse, 1: manager, 2: accessor (with access code) 
         type: String,
-        required: true
-    },
-    privileges: { // 0: nurse, 1: manager, 2: accessor (with access code) 
-        type: String,
-        default: '0'
+        default: 'normal'
     },
     password: {
         type: String,
