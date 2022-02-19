@@ -61,7 +61,6 @@ authRouter.post('/register', async function(req, res) {
 
     const user = await User.findOne({'name': req.body.name});
     console.log(user);
-
     if (user == null) {
         res.status(404).send({
             message: "User not found."
@@ -69,8 +68,6 @@ authRouter.post('/register', async function(req, res) {
         return;
     }
 
-    console.log(user.password);
-    console.log(req.body.password);
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
         res.status(404).send({
@@ -94,7 +91,50 @@ authRouter.post('/register', async function(req, res) {
         }
     )
 
-    res.status(201).send(token);
+    res.status(200).send(token);
+});
+
+/**
+ * @api {post} /auth/newuuid generates a new RegistrationToken instance
+ */
+ authRouter.post('/newuuid', async function(req, res) {
+    console.log(req.body);
+
+    let authorized = true;
+
+    const user = await User.findOne({'name': req.body.name});
+    console.log(user);
+    if (user == null) {
+        authorized = false;
+    }
+
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPassword) {
+        authorized = false;
+    }
+
+    if (req.body.role != 'Admin') {
+        authorized = false;
+    }
+
+    if (!authorized) {
+        res.status(404).send({
+            message: "User doesn't have required privileges/not authorized."
+        });
+        return;
+    }
+
+    var expirationDate = new Date();
+    expirationDate.setHours( expirationDate.getHours() + 2 );
+
+    const newUUIDToken = new Register({
+        token: req.body.uuid,
+        expiration: expirationDate,
+        role: user.role,
+        used: true
+    });
+
+    res.status(200).send(newUUIDToken);
 });
 
 /**
@@ -131,24 +171,6 @@ authRouter.post('/register', async function(req, res) {
         });
         return;
     }
-
-    const token = jwt.sign(
-        { 
-            "user": {
-                "name": user.name,
-                "role": user.role
-            }
-        },
-        process.env.JWT_SECRET,
-        {
-            "algorithm": "HS256",
-            "subject": user.name,
-            "expiresIn": "7d",
-        }
-    )
-
-    res.status(201).send(token);
-    console.log("Found valid token " + token);
 
     const salt = await bcrypt.genSalt(10);
     // now we set user password to hashed password
