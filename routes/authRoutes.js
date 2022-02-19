@@ -97,4 +97,76 @@ authRouter.post('/register', async function(req, res) {
     res.status(201).send(token);
 });
 
+/**
+ * @api {post} /auth/updatepassword - update a user's password
+ */
+ authRouter.post('/update_password', async function(req, res) {
+
+    // req format
+    /*
+    {
+        user: "username of user" // only if the admin is sending request
+        password: "new password"
+
+    }
+
+    user:
+    { 
+        name:
+        role: 
+    }
+
+    */
+
+    var isAdmin = req.body.user.role == 'admin'; 
+    var user = req.body.user.name; 
+    
+    if (isAdmin) {
+        user = req.body.user;
+    }
+
+    if (req.body.password == null) {
+        res.status(500).send({
+            message: "Please provide a new password."
+        });
+        return;
+    }
+
+    const token = jwt.sign(
+        { 
+            "user": {
+                "name": user.name,
+                "role": user.role
+            }
+        },
+        process.env.JWT_SECRET,
+        {
+            "algorithm": "HS256",
+            "subject": user.name,
+            "expiresIn": "7d",
+        }
+    )
+
+    res.status(201).send(token);
+    console.log("Found valid token " + token);
+
+    const salt = await bcrypt.genSalt(10);
+    // now we set user password to hashed password
+    const hash = await bcrypt.hash(req.body.password, salt);
+
+    // https://www.npmjs.com/package/bcrypt
+    // to check pw, bcrypt.compareSync(myPlaintextPassword, hash); // true
+
+    await UserModel.updateOne({ name: user }, { $set: { password: hash } }).catch(
+        error => {
+            console.log(error);
+            res.status(500).send({
+                message: err.message || "Some error occurred while updating the User."
+            });
+        }
+    );
+    
+    res.status(201).send("User updated successfully.");
+});
+
 module.exports = authRouter;
