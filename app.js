@@ -1,4 +1,5 @@
 const express = require('express');
+const expressJWT = require('express-jwt');
 const connectDB = require('./database/connection');
 const cors = require('cors');
 const authRouter = require('./routes/authRoutes');
@@ -14,10 +15,17 @@ const app = express();
 // connect database
 connectDB();
 
+app.use(expressJWT(
+    { 
+        secret: process.env.JWT_SECRET, 
+        algorithms: ["HS256"], 
+        credentialsRequired: false }
+    ))
 
 app.use(cors()); // for server to be accessible by other origin
 app.use(express.json()); // for parsing json
 app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
+app.use(expressJWT({ secret: process.env.JWT_SECRET, algorithms: ["HS256"], credentialsRequired: false }))
 
 // ROUTES
 app.use("/auth", authRouter);
