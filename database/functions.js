@@ -116,10 +116,10 @@ const addReport = async function(req, callback) {
 
     //todo come bck to this
     formDoc.save().then(result => {
-        callback(null, result);
+        callback(result, null);
     }).catch(err => {
         console.log("Error saving form: " + err.message);
-        callback(err, null);
+        callback(null, err);
     });
 }
 
