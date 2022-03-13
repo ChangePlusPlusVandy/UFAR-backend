@@ -90,7 +90,7 @@ authRouter.post('/register', async function(req, res) {
             "expiresIn": "7d",
         }
     )
-
+    console.log("token", token);
     res.status(200).send(token);
 });
 

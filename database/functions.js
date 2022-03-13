@@ -405,15 +405,19 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
     for (rep of reports) {
 
-        var health_area = rep['health_area'];
+        var health_area_id = rep['health_area'];
+        // get health_area using health_area_id
+        var health_area = (await HealthArea.findById(health_area_id).exec()).name;
         var village = rep['village'];
 
-        var diseases = rep['diseases_treated'];
-        var treated = diseases['onchocerciasis'] > 0 ||
-                    diseases['lymphatic_filariasis'] > 0 ||
-                    diseases['schistosomiasis'] > 0 ||
-                    diseases['soil_transmitted_helminthiasis'] > 0 ||
-                    diseases['trachoma'] > 0;
+        var treated = rep['onchocerciasis']["first_round"] > 0 ||
+                    rep['onchocerciasis']["second_round"] > 0 ||
+                    rep['lymphatic_filariasis']["mectizan_and_albendazole"] > 0 ||
+                    rep['lymphatic_filariasis']["albendazole_alone"]["first_round"] > 0 ||
+                    rep['lymphatic_filariasis']["albendazole_alone"]["second_round"] > 0 ||
+                    rep['schistosomiasis'] > 0 ||
+                    rep['soil_transmitted_helminthiasis'] > 0 ||
+                    rep['trachoma'] > 0;
 
         console.log("Report found with vill " + village + " and treated status " + treated);
 
