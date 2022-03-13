@@ -353,7 +353,12 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         "albendazole": {}
     }
 
+    console.log("results", results);
+
     for (const [area, value] of Object.entries(results)) {
+
+        console.log("area", area);
+        console.log("value", value);
 
         if (!(area in finalResults["mectizan"])) {
             finalResults["mectizan"][area] = 0
@@ -368,10 +373,12 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
             finalResults["albendazole"][area] = 0
         }
 
-        finalResults["mectizan"][area] += value["mectizan"] / value["enumerated_persons"]
-        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / value["enumerated_persons"]
-        finalResults["albendazole"][area] += value["albendazole"] / value["enumerated_persons"]
-        finalResults["praziquantel"][area] += value["praziquantel"] / value["enumerated_persons"] 
+        console.log("final results", finalResults);
+
+        finalResults["mectizan"][area] += value["mectizan"] / (value["enumerated_persons"] || 1) // avoid division by zero
+        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / (value["enumerated_persons"] || 1)
+        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1)
+        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1)
     }
 
     callback(finalResults, null);
