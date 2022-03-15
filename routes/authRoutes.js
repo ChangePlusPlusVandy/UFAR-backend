@@ -38,7 +38,8 @@ authRouter.post('/register', async function(req, res) {
     const user = new User({
         name: req.body.name,
         password: hash,
-        role: token.role
+        role: token.role,
+        health_zone: token.health_zone
     });
 
     user.save().then(result => {
@@ -80,7 +81,8 @@ authRouter.post('/register', async function(req, res) {
         { 
             "user": {
                 "name": user.name,
-                "role": user.role
+                "role": user.role,
+                "health_zone": user.health_zone
             }
         },
         process.env.JWT_SECRET,
@@ -98,43 +100,35 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/newuuid generates a new RegistrationToken instance
  */
  authRouter.post('/newuuid', async function(req, res) {
+    console.log(req.user);
     console.log(req.body);
 
-    let authorized = true;
-
-    const user = await User.findOne({'name': req.body.name});
-    console.log(user);
-    if (user == null) {
-        authorized = false;
-    }
-
-    const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) {
-        authorized = false;
-    }
-
-    if (req.body.role != 'Admin') {
-        authorized = false;
-    }
-
-    if (!authorized) {
+    if (!req.user || req.user.user.role != 'Admin') {
         res.status(404).send({
             message: "User doesn't have required privileges/not authorized."
         });
         return;
     }
 
-    var expirationDate = new Date();
+    let expirationDate = new Date();
     expirationDate.setHours( expirationDate.getHours() + 2 );
 
     const newUUIDToken = new Register({
         token: req.body.uuid,
         expiration: expirationDate,
-        role: user.role,
-        used: true
-    });
+        role: req.body.role,
+        used: false,
+        health_zone: mongoose.Types.ObjectId(req.body.health_zone_id)
+    })
 
-    res.status(200).send(newUUIDToken);
+    newUUIDToken.save().then(result => {
+        console.log("Successfully generated a new UUID token: \n" + result);
+        res.status(200).send(result);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while creating the new UUID token."
+        });
+    });
 });
 
 /**

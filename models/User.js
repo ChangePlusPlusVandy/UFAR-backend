@@ -18,6 +18,10 @@ const UserSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    health_zone: {
+        type: Schema.Types.ObjectId,
+        ref: 'HealthZone'
     }
 });
 

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// for scalability, if we for some reason end up with a lot of countries
 const RegistrationTokenSchema = new Schema({
     token: {
         type: String,
@@ -18,6 +17,10 @@ const RegistrationTokenSchema = new Schema({
     used: {
         type: Boolean,
         default: false
+    },
+    health_zone: {
+        type: Schema.Types.ObjectId,
+        ref: 'HealthZone'
     }
 });
 

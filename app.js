@@ -21,13 +21,6 @@ const authMiddleware = expressJWT({
 // connect database
 connectDB();
 
-app.use(expressJWT(
-    { 
-        secret: process.env.JWT_SECRET, 
-        algorithms: ["HS256"], 
-        credentialsRequired: false }
-    ))
-
 app.use(cors()); // for server to be accessible by other origin
 app.use(express.json()); // for parsing json
 app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
