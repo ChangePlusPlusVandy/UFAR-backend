@@ -218,16 +218,10 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         for (h in healthZone[0]["health_areas"]) {
             let healthArea = healthZone[0]["health_areas"][h];
 
-            // make array of the id's of all the villages in a health area
-            const villages = [];
-            for (v in healthArea.villages) {
-                let villageId = healthArea.villages[v];
-                villages.push(mongoose.Types.ObjectId(villageId));
-            }
-
             // find all reports that are for all the villages in the health area, are validated, and are from the past specified dates
-            const reports = await Report.find({ village: {$in: villages}, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
-
+            // console.log("date: " + earliestDate);
+            // every report instance has a health_area property. We implemented to the rendundancy to reducy queries to the database
+            const reports = await Report.find({ health_area: healthArea, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
             if (reports.length != 0) {
                 // these arrays hold the data about the drugs in the Drug Management section of a report
                 const drugsName = ["ivermectin", "albendazole", "praziquantel"];
@@ -249,10 +243,12 @@ const getDrugData = async function(health_zone_id, numPastDays) {
                     }
                 }
 
+
                 // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
                 drugData[healthArea.name] = {};
                 for (let i = 0; i < drugsName.length; i++) {
-                    let drugPercentage = Math.round(drugsUsed[i] / drugsReceived[i] * 100);
+                    let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
+                    console.log(drugPercentage);
                     drugData[healthArea.name][drugsName[i]] = drugPercentage;
                 }
             }
@@ -275,7 +271,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         const current = new Date();
         const prior = current.setDate(current.getDate() - time);
 
-        reports = await Report.find( {'health_zone': health_zone_id, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
     }
@@ -296,10 +292,8 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     const results = {}
 
     for (rep of reports) {
-        var health_area = rep['health_area'];
-
-        console.log("Viewing report " + rep);
-
+        var health_area_id = rep['health_area'];
+        var health_area = (await HealthArea.findOne({'_id': health_area_id}).exec()).name;
         var patients = rep['patients'];
 
         var enumerated_persons = 
@@ -353,8 +347,6 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         "albendazole": {}
     }
 
-    console.log("results", results);
-
     for (const [area, value] of Object.entries(results)) {
 
         console.log("area", area);
@@ -373,12 +365,11 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
             finalResults["albendazole"][area] = 0
         }
 
-        console.log("final results", finalResults);
 
-        finalResults["mectizan"][area] += value["mectizan"] / (value["enumerated_persons"] || 1) // avoid division by zero
-        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / (value["enumerated_persons"] || 1)
-        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1)
-        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1)
+        finalResults["mectizan"][area] += value["mectizan"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
+        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1) * 100
     }
 
     callback(finalResults, null);
@@ -394,7 +385,7 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
         console.log(new Date(prior))
 
-        reports = await Report.find( {'health_zone': health_zone_id, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
 
         console.log("Waiting for report " + reports.length);
     } catch(err) {
@@ -453,10 +444,10 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
     // go through each health area and compute percent treated
     for (const [area, value] of Object.entries(results)) {
-        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length)
+        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length) * 100
     }
 
-    callback({"village_coverage": finalResults}, null);
+    callback(finalResults, null);
 }
 
 module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage };
