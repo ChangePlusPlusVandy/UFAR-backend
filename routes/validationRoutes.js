@@ -1,30 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const functions = require('../database/functions');
+const Report = require('../models/Report');
 const validationRouter = express.Router();
 
 /**
- * @api {post} /validation/<health_zone_id>/reports/validate validate list of reports from a health zone
+ * @api {post} /validation/<health_zone_id>/reports/validate validate a report
  */
-validationRouter.post('/:health_zone_id/reports/validate', (req, res) => {
-
-    console.log("Validating Health Zone reports endpoint reached, and received following data: ");
+validationRouter.post('/:health_zone_id/reports/validate', async (req, res) => {
     console.log(req.body);
 
-    // calls helper function
-    functions.validateHealthZoneReports(req.body).then(data => {
-        if (data.error != null) {
-            console.log("Error occurred when updating Health Zone reports: " + data.error);
-            res.status(500).send({
-                message: data.error.message || "Some error occurred when validating/updating health zone reports."
-            });
-        } else {
-            console.log("Validated/updated " + req.body.length + " health zone reports: ");
-            console.log(data.result);
-            res.status(200).send(data.result);
-        }
-    });
+    try {
+        const id = mongoose.Types.ObjectId(req.body.id);
+        const validatedReport = await Report.findByIdAndUpdate(id, {is_validated: true}, {new: true});
 
+        console.log("Validated report with id " + id);
+        console.log(validatedReport);
+        res.status(200).send(validatedReport);
+    } catch (err) {
+        console.log("Error occurred when validating report: " + err.message);
+        res.status(500).send({
+            message: err.message || "Some error occurred when validating report."
+        });
+    }
 });
 
 /**
