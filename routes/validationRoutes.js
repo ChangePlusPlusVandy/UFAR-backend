@@ -7,7 +7,7 @@ const validationRouter = express.Router();
 /**
  * @api {post} /validation/<health_zone_id>/reports/validate validate a report
  */
-validationRouter.post('/:health_zone_id/reports/validate', async (req, res) => {
+validationRouter.post('/reports/validate', async (req, res) => {
     console.log(req.body);
 
     try {
