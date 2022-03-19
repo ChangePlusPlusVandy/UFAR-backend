@@ -123,30 +123,6 @@ const addReport = async function(req, callback) {
     });
 }
 
-const validateHealthZoneReports = async function(reports) {
-
-    try {
-        
-        const updatedReports = [];
-
-        for (const report of reports) {
-            const id = mongoose.Types.ObjectId(report._id);
-            delete report._id;
-
-            const updatedReport = await Report.findByIdAndUpdate(id, {...report}, {new: true});
-
-            updatedReports.push(updatedReport);
-        }
-
-        return {result: updatedReports, error: null};
-
-    } catch (err) {
-
-        return {result: null, error: err};
-
-    }
-}
-
 /**
  * 
  * @param {*} health_zone_id The health zone the forms belong to
