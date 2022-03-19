@@ -35,14 +35,16 @@ validationRouter.post('/:health_zone_id/reports/validate', (req, res) => {
     var health_zone_id = req.params.health_zone_id;
     // good test 1 - 618b21eb8453970bd916764c
 
+    console.log("Health zone id received: " + health_zone_id);
+
     // call helper function
     functions.getForms(health_zone_id, "unvalidated", (err, result) => {
         if (err == null) {
-            console.log("Found and returned " + result.length + " forms");
+            console.log("Found and returned " + result?.length + " forms");
             res.status(200).send(result);
         } else {
             console.log("Error getting forms for health zone: " + err);
-            res.status(500).send({
+            res.status(500).send({ 
                 message: err.message || "Some error occurred while receiving forms."
             });
         }

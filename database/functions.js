@@ -159,7 +159,7 @@ const getForms = function(health_zone_id, validation_status, callback) {
     HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
 
         if (err == null) {
-            if (result.length == 0) {
+            if (!result) {
                 callback({
                     message: "Could not find health zone with id " + health_zone_id
                 }, {});

@@ -31,11 +31,13 @@ dataRouter.get('/locations', (req, res) => {
  dataRouter.post('/:health_zone_id/therapeutic_coverage', (req, res) => {
 
     var health_zone_id = req.params.health_zone_id;
+    // todo: return error if health_zone_id is invalid or not provided
     // good test 1 - 618b21eb8453970bd916764c
     // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function
     functions.getTherapeuticCoverage(health_zone_id, 30, (result, err) => {
+        // todo: ask stake holders (if dmm day or monthly) and integrate into this
         if (err == null) {
             console.log("Found and returned " + result);
             res.status(200).send(result);
@@ -53,6 +55,7 @@ dataRouter.get('/locations', (req, res) => {
  */
  dataRouter.post('/:health_zone_id/geographic_coverage', (req, res) => {
 
+    // todo: return error if health_zone_id is invalid or not provided
     var health_zone_id = req.params.health_zone_id;
     console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
     // good test 1 - 618b21eb8453970bd916764c
@@ -77,6 +80,7 @@ dataRouter.get('/locations', (req, res) => {
  * @api {post} /data/<health_zone_id>/drugs - provide drug proportion data for drug dashboard
  */
  dataRouter.post('/:health_zone_id/drugs', (req, res) => {
+    // todo: return error if health_zone_id is invalid or not provided
     let health_zone_id = mongoose.Types.ObjectId(req.params.health_zone_id);
     console.log("Received request for drug proportion data from health zone with id: " + health_zone_id);
 

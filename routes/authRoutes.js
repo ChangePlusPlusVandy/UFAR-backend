@@ -7,6 +7,7 @@ const authRouter = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+const uuid = require("uuid");
 
 /**
  * @api {post} /auth/register register a user
@@ -47,6 +48,9 @@ authRouter.post('/register', async function(req, res) {
 
         token.used = true;
         token.save();
+        // todo: probably need to delete token from db after it's been used
+        // delete token from db
+        // token.deleteOne();
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Some error occurred while creating the User."
@@ -103,7 +107,7 @@ authRouter.post('/register', async function(req, res) {
     console.log(req.user);
     console.log(req.body);
 
-    if (!req.user || req.user.user.role != 'Admin') {
+    if (!req.user && req.user.user.role != 'Admin') {
         res.status(404).send({
             message: "User doesn't have required privileges/not authorized."
         });
@@ -114,11 +118,11 @@ authRouter.post('/register', async function(req, res) {
     expirationDate.setHours( expirationDate.getHours() + 2 );
 
     const newUUIDToken = new Register({
-        token: req.body.uuid,
+        token: uuid.v4(),
         expiration: expirationDate,
         role: req.body.role,
         used: false,
-        health_zone: mongoose.Types.ObjectId(req.body.health_zone_id)
+        health_zone: mongoose.Types.ObjectId(req.body.health_zone)
     })
 
     newUUIDToken.save().then(result => {
@@ -136,6 +140,10 @@ authRouter.post('/register', async function(req, res) {
  */
  authRouter.post('/update_password', async function(req, res) {
 
+    if (!req.user) res.status(401).send({
+            message: "User doesn't have required privileges/not authorized."
+    });
+
     // req format
     /*
     {
@@ -152,11 +160,10 @@ authRouter.post('/register', async function(req, res) {
 
     */
 
-    var isAdmin = req.body.user.role == 'admin'; 
-    var user = req.body.user.name; 
+    var username = req.user.user.name; // if a normal user is sending request, this will be the username
     
-    if (isAdmin) {
-        user = req.body.user;
+    if (req.user.user.role.toLowerCase() == 'admin') {
+        username = req.body.username; // if admin is sending request, use the username provided
     }
 
     if (req.body.password == null) {
@@ -173,7 +180,7 @@ authRouter.post('/register', async function(req, res) {
     // https://www.npmjs.com/package/bcrypt
     // to check pw, bcrypt.compareSync(myPlaintextPassword, hash); // true
 
-    await UserModel.updateOne({ name: user }, { $set: { password: hash } }).catch(
+    await User.updateOne({ name: username }, { $set: { password: hash } }).catch(
         error => {
             console.log(error);
             res.status(500).send({
