@@ -16,11 +16,19 @@ authRouter.post('/register', async function(req, res) {
     console.log('Test');
     console.log(req.body);
 
+    // Check if user already exists
+    var existingUser = await User.findOne({name: req.body.name});
+
     const token = await Register.findOne({ 'token': req.body.uuid, used: false, expiration: {"$gte": new Date()} });
 
     if (token == null) {
         res.status(500).send({
             message: "Please provide a valid token."
+        });
+        return;
+    } else if (existingUser != null) {
+        res.status(500).send({
+            message: "User already exists."
         });
         return;
     }
