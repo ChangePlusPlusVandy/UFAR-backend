@@ -70,8 +70,10 @@ const formatLocationData = function(locationData) {
 // req should have all the necessary data, res is callback for result
 const addReport = async function(req, callback) {
     // hold up - we're dealing with json can't we just do this lmao. 
-
+    
     var rawBody = req.body;
+
+    rawBody['submitter'] = req.user.user._id; // Store the submitting user
 
     if (rawBody.village instanceof String) {
         // We must replace it with mongo object id type
@@ -83,14 +85,8 @@ const addReport = async function(req, callback) {
             // We must replace it with mongo object id type
             rawBody.province = mongoose.Types.ObjectId(rawBody.province);
         }
-    }
+    } 
 
-    if ('health_zone' in rawBody) {
-        if (rawBody.health_zone instanceof String) {
-            // We must replace it with mongo object id type
-            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
-        }
-    }
 
     if ('health_area' in rawBody) {
         if (rawBody.health_area instanceof String) {
@@ -103,6 +99,17 @@ const addReport = async function(req, callback) {
         rawBody.health_area = ha['_id']
     }
 
+    if ('health_zone' in rawBody) {
+        if (rawBody.health_zone instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
+        }
+    } else {
+        // We must find health area if they didn't provide it
+        var hz = await HealthZone.findOne({'health_areas': {'$in': rawBody.health_area}}).exec();
+        rawBody.health_zone = hz['_id']
+    }
+
     if ('village' in rawBody) {
         if (rawBody.village instanceof String) {
             // We must replace it with mongo object id type
@@ -110,26 +117,53 @@ const addReport = async function(req, callback) {
         }
     }
 
-    var formDoc = new Report(req.body);
-      
-    console.log("New report created");
+    if ('_id' in rawBody) {
+        // We are updating an existing document
 
-    //todo come bck to this
-    formDoc.save().then(result => {
+        parsedId = rawBody._id;
+
+        if (parsedId instanceof String) {
+            parsedId = mongoose.Types.ObjectId(parsedId)
+        }
+
+        const result = await Report.findByIdAndUpdate(parsedId, rawBody, {new: true});
+
+        /*
+        Report.updateMany({ _id: parsedId }, { $set: { "Changed": true } }).catch(
+            error => {
+                console.log("Error updating form: " + error.message);
+                callback(null, error)
+            }
+        );*/
+
+        console.log("Form updated ww/ id " + rawBody._id);
+
         callback(result, null);
-    }).catch(err => {
-        console.log("Error saving form: " + err.message);
-        callback(null, err);
-    });
+    }
+    else
+    {
+        // Create new doc
+        var formDoc = new Report(req.body);
+    
+        //todo come bck to this
+        formDoc.save().then(result => {
+            console.log("new form inserted");
+            callback(result, null);
+        }).catch(err => {
+            console.log("Error saving form: " + err.message);
+            callback(null, err);
+        });
+    }
 }
 
 /**
  * 
  * @param {*} health_zone_id The health zone the forms belong to
  * @param {*} validation_status "validated", "unvalidated", or "" depending on what types of forms are desired
+ * @param {*} user The user that created the token. Blank for all users
  * @param {*} callback The callback to send to once the request has been completed (error or not)
  */
-const getForms = function(health_zone_id, validation_status, callback) {
+const getForms = function(health_zone_id, validation_status, user, callback) {
 
     // first we get the healthzone's villages
     HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
@@ -145,9 +179,17 @@ const getForms = function(health_zone_id, validation_status, callback) {
             var findParams = {
                 "health_zone": result._id
             };
+
+            console.log("hzid " + health_zone_id);
         
             if (validation_status == "validated") findParams['is_validated'] = true;
             if (validation_status == "unvalidated") findParams['is_validated'] = false;
+            if (user != "") {
+                if (user instanceof String) {
+                    user = mongoose.Types.ObjectId(user);
+                }
+                findParams['submitter'] = mongoose.Types.ObjectId(user);
+            }
         
             Report.find(findParams).exec(callback);   
         } else {
@@ -366,6 +408,7 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
         console.log("Waiting for report " + reports.length);
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
+        return;
     }
  
     /*
