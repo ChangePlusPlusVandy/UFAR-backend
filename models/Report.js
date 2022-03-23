@@ -14,6 +14,11 @@ const ReportSchema = new Schema({
         //ref: 'User'
     },
 
+    submitter: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+
     village: {
         type: Schema.Types.ObjectId,
         ref: 'Village'

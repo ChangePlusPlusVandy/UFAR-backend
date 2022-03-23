@@ -10,6 +10,12 @@ const { formatLocationData } = require('../database/functions');
  */
 dataRouter.get('/locations', (req, res) => {
 
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     // handle w/ helper
     functions.getLocationData((err, result) => {
         console.log("Location result received - " + err);
@@ -29,6 +35,12 @@ dataRouter.get('/locations', (req, res) => {
  * @api {post} /health zone id/therapeutic_coverage - get therapeutic coverage stats for health zone
  */
  dataRouter.post('/:health_zone_id/therapeutic_coverage', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     var health_zone_id = req.params.health_zone_id;
     // todo: return error if health_zone_id is invalid or not provided
@@ -55,6 +67,12 @@ dataRouter.get('/locations', (req, res) => {
  */
  dataRouter.post('/:health_zone_id/geographic_coverage', (req, res) => {
 
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     // todo: return error if health_zone_id is invalid or not provided
     var health_zone_id = req.params.health_zone_id;
     console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
@@ -80,6 +98,13 @@ dataRouter.get('/locations', (req, res) => {
  * @api {post} /data/<health_zone_id>/drugs - provide drug proportion data for drug dashboard
  */
  dataRouter.post('/:health_zone_id/drugs', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     // todo: return error if health_zone_id is invalid or not provided
     let health_zone_id = mongoose.Types.ObjectId(req.params.health_zone_id);
     console.log("Received request for drug proportion data from health zone with id: " + health_zone_id);

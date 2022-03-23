@@ -94,7 +94,8 @@ authRouter.post('/register', async function(req, res) {
             "user": {
                 "name": user.name,
                 "role": user.role,
-                "health_zone": user.health_zone
+                "health_zone": user.health_zone,
+                "_id": user._id
             }
         },
         process.env.JWT_SECRET,
@@ -112,6 +113,12 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/newuuid generates a new RegistrationToken instance
  */
  authRouter.post('/newuuid', async function(req, res) {
+    // verify user
+    if (!req.user) res.status(401).send("Unauthorized user error");
+
+    // make sure they are admin
+    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
+
     console.log(req.user);
     console.log(req.body);
 

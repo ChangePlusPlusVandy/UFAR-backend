@@ -8,6 +8,13 @@ const validationRouter = express.Router();
  * @api {post} /validation/<health_zone_id>/reports/validate validate a report
  */
 validationRouter.post('/reports/validate', async (req, res) => {
+    // verify user
+    if (!req.user) res.status(401).send("Unauthorized user error");
+
+    // make sure they are admin
+    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
+
+
     console.log(req.body);
 
     try {
@@ -26,6 +33,11 @@ validationRouter.post('/reports/validate', async (req, res) => {
  * @api {post} /validation/<health_zone_id>/reports
  */
  validationRouter.get('/:health_zone_id/reports', (req, res) => {
+    // verify user
+    if (!req.user) res.status(401).send("Unauthorized user error");
+
+    // make sure they are admin
+    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
 
     var health_zone_id = req.params.health_zone_id;
     // good test 1 - 618b21eb8453970bd916764c
