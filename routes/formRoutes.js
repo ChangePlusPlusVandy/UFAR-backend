@@ -36,9 +36,7 @@ formRouter.post('/insert', (req, res) => {
 
     // handle w/ helper
 
-    console.log("S ID " + req.user.user._id);
-
-    functions.getForms(req.user.user.health_zone, "unvalidated", req.user.user._id, (err, result) => {
+    functions.getForms(req.user.user.health_zone, "unvalidated", (err, result) => {
         if (err == null) {
             console.log("Found and returned " + result?.length + " forms");
             res.status(200).send(result);
@@ -48,7 +46,7 @@ formRouter.post('/insert', (req, res) => {
                 message: err.message || "Some error occurred while receiving forms."
             });
         }
-    });
+    }, req.user.user._id);
 });
 
 

@@ -117,7 +117,9 @@ const addReport = async function(req, callback) {
         }
     }
 
-    if ('_id' in rawBody) {
+    // check if rawBody._id is a valid object id
+    if (mongoose.Types.ObjectId.isValid(rawBody._id) &&
+        (String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
         // We are updating an existing document
 
         parsedId = rawBody._id;
@@ -163,7 +165,7 @@ const addReport = async function(req, callback) {
  * @param {*} user The user that created the token. Blank for all users
  * @param {*} callback The callback to send to once the request has been completed (error or not)
  */
-const getForms = function(health_zone_id, validation_status, user, callback) {
+const getForms = function(health_zone_id, validation_status, callback, user="") {
 
     // first we get the healthzone's villages
     HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
@@ -179,8 +181,6 @@ const getForms = function(health_zone_id, validation_status, user, callback) {
             var findParams = {
                 "health_zone": result._id
             };
-
-            console.log("hzid " + health_zone_id);
         
             if (validation_status == "validated") findParams['is_validated'] = true;
             if (validation_status == "unvalidated") findParams['is_validated'] = false;

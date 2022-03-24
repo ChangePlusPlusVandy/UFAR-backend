@@ -33,27 +33,35 @@ validationRouter.post('/reports/validate', async (req, res) => {
  * @api {post} /validation/<health_zone_id>/reports
  */
  validationRouter.get('/:health_zone_id/reports', (req, res) => {
+
+    console.log("user", req.user);
+
     // verify user
-    if (!req.user) res.status(401).send("Unauthorized user error");
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     // make sure they are admin
-    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
+    if (req.user.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
 
     var health_zone_id = req.params.health_zone_id;
     // good test 1 - 618b21eb8453970bd916764c
 
-    console.log("Health zone id received: " + health_zone_id);
-
     // call helper function
-    functions.getForms(health_zone_id, "unvalidated", (err, result) => {
+    functions.getForms(health_zone_id, "unvalidated",  (err, result) => {
         if (err == null) {
-            console.log("Found and returned " + result?.length + " forms");
             res.status(200).send(result);
+            return;
         } else {
             console.log("Error getting forms for health zone: " + err);
             res.status(500).send({ 
                 message: err.message || "Some error occurred while receiving forms."
             });
+            return;
         }
     });
 });
