@@ -9,7 +9,10 @@ const formRouter = express.Router();
 formRouter.post('/insert', (req, res) => {
 
     // verify user
-    if (!req.user) res.status(401).send("Unauthorized user error");
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     // call helper function
     functions.addReport(req, (result, err) => {
@@ -32,7 +35,10 @@ formRouter.post('/insert', (req, res) => {
  formRouter.get('/get_unvalidated', (req, res) => {
 
     // verify user
-    if (!req.user) res.status(401).send("Unauthorized user error");
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error"); 
+        return;
+    }
 
     // handle w/ helper
 

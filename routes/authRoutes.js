@@ -114,10 +114,16 @@ authRouter.post('/register', async function(req, res) {
  */
  authRouter.post('/newuuid', async function(req, res) {
     // verify user
-    if (!req.user) res.status(401).send("Unauthorized user error");
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     // make sure they are admin
-    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
+    if (req.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return
+    }
 
     console.log(req.user);
     console.log(req.body);
@@ -155,9 +161,11 @@ authRouter.post('/register', async function(req, res) {
  */
  authRouter.post('/update_password', async function(req, res) {
 
-    if (!req.user) res.status(401).send({
-            message: "User doesn't have required privileges/not authorized."
-    });
+    if (!req.user) {
+        res.status(401).send({
+        message: "User doesn't have required privileges/not authorized."});
+        return;
+    }
 
     // req format
     /*

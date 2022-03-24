@@ -9,13 +9,16 @@ const validationRouter = express.Router();
  */
 validationRouter.post('/reports/validate', async (req, res) => {
     // verify user
-    if (!req.user) res.status(401).send("Unauthorized user error");
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     // make sure they are admin
-    if (req.user.role != 'admin') res.status(401).send("Authorized user must be an admin");
-
-
-    console.log(req.body);
+    if (req.user.role != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
 
     try {
         const id = mongoose.Types.ObjectId(req.body._id);
