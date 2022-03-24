@@ -15,7 +15,7 @@ validationRouter.post('/reports/validate', async (req, res) => {
     }
 
     // make sure they are admin
-    if (req.user.role != 'admin') {
+    if (req.user.user.role.toLowerCase() != 'admin') {
         res.status(401).send("Authorized user must be an admin");
         return;
     }
