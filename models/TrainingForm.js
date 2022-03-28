@@ -31,12 +31,14 @@ const TrainingFormSchema = new Schema({
         },
 
         reportingProvince: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Province',
             required: true
         },
 
         coordinatingProvince: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Province',
             required: true
         },
 
