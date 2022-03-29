@@ -3,6 +3,16 @@ const Schema = mongoose.Schema;
 
 const TrainingFormSchema = new Schema({
     // IDENTIFICATION
+    province: {
+        type: Schema.Types.ObjectId,
+        ref: 'Province'
+    },
+    
+    health_zone: { 
+        type: Schema.Types.ObjectId,
+        ref: 'HealthZone'
+    },
+    
     chiefName: {
         type: String,
         required: true
@@ -275,7 +285,7 @@ const TrainingFormSchema = new Schema({
 
     // ESPM
     implementationESPM: {
-        type: SVGStringList,
+        type: String,
         required: true
     },
 
