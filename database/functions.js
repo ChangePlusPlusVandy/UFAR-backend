@@ -452,15 +452,21 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 const addTrainingForm = async function(req) {
         var rawBody = req.body;
 
-        if ('province' in rawBody) {
-            if (rawBody.province instanceof String) {
-                rawBody.province = mongoose.Types.ObjectId(rawBody.province);
+        if ('chiefName' in rawBody) {
+            if (rawBody.chiefName instanceof String) {
+                rawBody.chiefName = mongoose.Types.ObjectId(rawBody.chiefName);
             }
         }
 
-        if ('health_zone' in rawBody) {
-            if (rawBody.health_zone instanceof String) {
-                rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
+        if ('reportingProvince' in rawBody) {
+            if (rawBody.reportingProvince instanceof String) {
+                rawBody.reportingProvince = mongoose.Types.ObjectId(rawBody.reportingProvince);
+            }
+        }
+
+        if ('coordinatingProvince' in rawBody) {
+            if (rawBody.coordinatingProvince instanceof String) {
+                rawBody.coordinatingProvince = mongoose.Types.ObjectId(rawBody.coordinatingProvince);
             }
         }
 
@@ -469,8 +475,4 @@ const addTrainingForm = async function(req) {
         return newTrainingForm.save();
 }
 
-const getTrainingForms = async function(health_zone_id) {
-    return TrainingForm.find({'health_zone': health_zone_id});
-}
-
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, getTrainingForms };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm };

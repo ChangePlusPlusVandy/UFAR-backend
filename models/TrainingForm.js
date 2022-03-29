@@ -271,7 +271,7 @@ const TrainingFormSchema = new Schema({
     // ESPM
     ESPM: {
         implementationESPM: {
-            type: SVGStringList,
+            type: String,
             required: true
         },
         awarenessStartDate: {
