@@ -12,26 +12,25 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
+const authMiddleware = expressJWT({
+        secret: process.env.JWT_SECRET,
+        algorithms: ["HS256"],
+        credentialsRequired: false 
+    });
+
 // connect database
 connectDB();
-
-app.use(expressJWT(
-    { 
-        secret: process.env.JWT_SECRET, 
-        algorithms: ["HS256"], 
-        credentialsRequired: false }
-    ))
 
 app.use(cors()); // for server to be accessible by other origin
 app.use(express.json()); // for parsing json
 app.use(express.urlencoded({ extended: true })); // for parsing url encoded data
-app.use(expressJWT({ secret: process.env.JWT_SECRET, algorithms: ["HS256"], credentialsRequired: false }))
+app.use(authMiddleware);
 
 // ROUTES
-app.use("/auth", authRouter);
-app.use("/form", formRouter);
-app.use("/data", dataRouter);
-app.use("/validation", validationRouter);
+app.use("/auth", authMiddleware, authRouter);
+app.use("/form", authMiddleware, formRouter);
+app.use("/data", authMiddleware, dataRouter);
+app.use("/validation", authMiddleware, validationRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World, this is UFAR');

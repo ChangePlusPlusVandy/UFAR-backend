@@ -10,6 +10,12 @@ const { formatLocationData } = require('../database/functions');
  */
 dataRouter.get('/locations', (req, res) => {
 
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     // handle w/ helper
     functions.getLocationData((err, result) => {
         console.log("Location result received - " + err);
@@ -30,12 +36,20 @@ dataRouter.get('/locations', (req, res) => {
  */
  dataRouter.post('/:health_zone_id/therapeutic_coverage', (req, res) => {
 
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     var health_zone_id = req.params.health_zone_id;
+    // todo: return error if health_zone_id is invalid or not provided
     // good test 1 - 618b21eb8453970bd916764c
     // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function
     functions.getTherapeuticCoverage(health_zone_id, 30, (result, err) => {
+        // todo: ask stake holders (if dmm day or monthly) and integrate into this
         if (err == null) {
             console.log("Found and returned " + result);
             res.status(200).send(result);
@@ -52,6 +66,12 @@ dataRouter.get('/locations', (req, res) => {
  * @api {post} /data/health zone id/geographic_coverage - get geographic coverage stats for health zone
  */
  dataRouter.post('/:health_zone_id/geographic_coverage', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
     var health_zone_id = req.params.health_zone_id;
     console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
@@ -77,6 +97,14 @@ dataRouter.get('/locations', (req, res) => {
  * @api {post} /data/<health_zone_id>/drugs - provide drug proportion data for drug dashboard
  */
  dataRouter.post('/:health_zone_id/drugs', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // todo: return error if health_zone_id is invalid or not provided
     let health_zone_id = mongoose.Types.ObjectId(req.params.health_zone_id);
     console.log("Received request for drug proportion data from health zone with id: " + health_zone_id);
 

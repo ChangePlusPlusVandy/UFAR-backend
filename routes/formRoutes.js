@@ -9,9 +9,16 @@ const TrainingForm = require('../models/TrainingForm');
  */
 formRouter.post('/insert', (req, res) => {
 
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
     // call helper function
     functions.addReport(req, (result, err) => {
         if (err == null) {
+            console.log(result);
             console.log("Saved " + result.nurse + "'s form");
             res.status(200).send(result);
         } else {
@@ -55,6 +62,32 @@ formRouter.post('/insert', (req, res) => {
             message: err.message || "Some error occurred while retrieving training forms."
         });
     });
+});
+
+/**
+ * @api {post} /form/get_unvalidated
+ */
+ formRouter.get('/get_unvalidated', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error"); 
+        return;
+    }
+
+    // handle w/ helper
+
+    functions.getForms(req.user.user.health_zone, "unvalidated", (err, result) => {
+        if (err == null) {
+            console.log("Found and returned " + result?.length + " forms");
+            res.status(200).send(result);
+        } else {
+            console.log("Error getting forms for health zone: " + err);
+            res.status(500).send({ 
+                message: err.message || "Some error occurred while receiving forms."
+            });
+        }
+    }, req.user.user._id);
 });
 
 module.exports = formRouter;

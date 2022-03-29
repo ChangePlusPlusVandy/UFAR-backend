@@ -71,8 +71,10 @@ const formatLocationData = function(locationData) {
 // req should have all the necessary data, res is callback for result
 const addReport = async function(req, callback) {
     // hold up - we're dealing with json can't we just do this lmao. 
-
+    
     var rawBody = req.body;
+
+    rawBody['submitter'] = req.user.user._id; // Store the submitting user
 
     if (rawBody.village instanceof String) {
         // We must replace it with mongo object id type
@@ -84,14 +86,8 @@ const addReport = async function(req, callback) {
             // We must replace it with mongo object id type
             rawBody.province = mongoose.Types.ObjectId(rawBody.province);
         }
-    }
+    } 
 
-    if ('health_zone' in rawBody) {
-        if (rawBody.health_zone instanceof String) {
-            // We must replace it with mongo object id type
-            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
-        }
-    }
 
     if ('health_area' in rawBody) {
         if (rawBody.health_area instanceof String) {
@@ -104,6 +100,17 @@ const addReport = async function(req, callback) {
         rawBody.health_area = ha['_id']
     }
 
+    if ('health_zone' in rawBody) {
+        if (rawBody.health_zone instanceof String) {
+            // We must replace it with mongo object id type
+            rawBody.health_zone = mongoose.Types.ObjectId(rawBody.health_zone);
+        }
+    } else {
+        // We must find health area if they didn't provide it
+        var hz = await HealthZone.findOne({'health_areas': {'$in': rawBody.health_area}}).exec();
+        rawBody.health_zone = hz['_id']
+    }
+
     if ('village' in rawBody) {
         if (rawBody.village instanceof String) {
             // We must replace it with mongo object id type
@@ -111,40 +118,44 @@ const addReport = async function(req, callback) {
         }
     }
 
-    var formDoc = new Report(req.body);
-      
-    console.log("New report created");
+    // check if rawBody._id is a valid object id
+    if (mongoose.Types.ObjectId.isValid(rawBody._id) &&
+        (String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
+        // We are updating an existing document
 
-    //todo come bck to this
-    formDoc.save().then(result => {
-        callback(null, result);
-    }).catch(err => {
-        console.log("Error saving form: " + err.message);
-        callback(err, null);
-    });
-}
+        parsedId = rawBody._id;
 
-const validateHealthZoneReports = async function(reports) {
-
-    try {
-        
-        const updatedReports = [];
-
-        for (const report of reports) {
-            const id = mongoose.Types.ObjectId(report._id);
-            delete report._id;
-
-            const updatedReport = await Report.findByIdAndUpdate(id, {...report}, {new: true});
-
-            updatedReports.push(updatedReport);
+        if (parsedId instanceof String) {
+            parsedId = mongoose.Types.ObjectId(parsedId)
         }
 
-        return {result: updatedReports, error: null};
+        const result = await Report.findByIdAndUpdate(parsedId, rawBody, {new: true});
 
-    } catch (err) {
+        /*
+        Report.updateMany({ _id: parsedId }, { $set: { "Changed": true } }).catch(
+            error => {
+                console.log("Error updating form: " + error.message);
+                callback(null, error)
+            }
+        );*/
 
-        return {result: null, error: err};
+        console.log("Form updated ww/ id " + rawBody._id);
 
+        callback(result, null);
+    }
+    else
+    {
+        // Create new doc
+        var formDoc = new Report(req.body);
+    
+        //todo come bck to this
+        formDoc.save().then(result => {
+            console.log("new form inserted");
+            callback(result, null);
+        }).catch(err => {
+            console.log("Error saving form: " + err.message);
+            callback(null, err);
+        });
     }
 }
 
@@ -152,15 +163,16 @@ const validateHealthZoneReports = async function(reports) {
  * 
  * @param {*} health_zone_id The health zone the forms belong to
  * @param {*} validation_status "validated", "unvalidated", or "" depending on what types of forms are desired
+ * @param {*} user The user that created the token. Blank for all users
  * @param {*} callback The callback to send to once the request has been completed (error or not)
  */
-const getForms = function(health_zone_id, validation_status, callback) {
+const getForms = function(health_zone_id, validation_status, callback, user="") {
 
     // first we get the healthzone's villages
     HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
 
         if (err == null) {
-            if (result.length == 0) {
+            if (!result) {
                 callback({
                     message: "Could not find health zone with id " + health_zone_id
                 }, {});
@@ -173,6 +185,12 @@ const getForms = function(health_zone_id, validation_status, callback) {
         
             if (validation_status == "validated") findParams['is_validated'] = true;
             if (validation_status == "unvalidated") findParams['is_validated'] = false;
+            if (user != "") {
+                if (user instanceof String) {
+                    user = mongoose.Types.ObjectId(user);
+                }
+                findParams['submitter'] = mongoose.Types.ObjectId(user);
+            }
         
             Report.find(findParams).exec(callback);   
         } else {
@@ -219,16 +237,10 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         for (h in healthZone[0]["health_areas"]) {
             let healthArea = healthZone[0]["health_areas"][h];
 
-            // make array of the id's of all the villages in a health area
-            const villages = [];
-            for (v in healthArea.villages) {
-                let villageId = healthArea.villages[v];
-                villages.push(mongoose.Types.ObjectId(villageId));
-            }
-
             // find all reports that are for all the villages in the health area, are validated, and are from the past specified dates
-            const reports = await Report.find({ village: {$in: villages}, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
-
+            // console.log("date: " + earliestDate);
+            // every report instance has a health_area property. We implemented to the rendundancy to reducy queries to the database
+            const reports = await Report.find({ health_area: healthArea, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
             if (reports.length != 0) {
                 // these arrays hold the data about the drugs in the Drug Management section of a report
                 const drugsName = ["ivermectin", "albendazole", "praziquantel"];
@@ -250,10 +262,12 @@ const getDrugData = async function(health_zone_id, numPastDays) {
                     }
                 }
 
+
                 // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
                 drugData[healthArea.name] = {};
                 for (let i = 0; i < drugsName.length; i++) {
-                    let drugPercentage = Math.round(drugsUsed[i] / drugsReceived[i] * 100);
+                    let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
+                    console.log(drugPercentage);
                     drugData[healthArea.name][drugsName[i]] = drugPercentage;
                 }
             }
@@ -276,7 +290,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         const current = new Date();
         const prior = current.setDate(current.getDate() - time);
 
-        reports = await Report.find( {'health_zone': health_zone_id, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
     }
@@ -297,10 +311,8 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     const results = {}
 
     for (rep of reports) {
-        var health_area = rep['health_area'];
-
-        console.log("Viewing report " + rep);
-
+        var health_area_id = rep['health_area'];
+        var health_area = (await HealthArea.findOne({'_id': health_area_id}).exec()).name;
         var patients = rep['patients'];
 
         var enumerated_persons = 
@@ -356,6 +368,9 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
     for (const [area, value] of Object.entries(results)) {
 
+        console.log("area", area);
+        console.log("value", value);
+
         if (!(area in finalResults["mectizan"])) {
             finalResults["mectizan"][area] = 0
         }
@@ -369,10 +384,11 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
             finalResults["albendazole"][area] = 0
         }
 
-        finalResults["mectizan"][area] += value["mectizan"] / value["enumerated_persons"]
-        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / value["enumerated_persons"]
-        finalResults["albendazole"][area] += value["albendazole"] / value["enumerated_persons"]
-        finalResults["praziquantel"][area] += value["praziquantel"] / value["enumerated_persons"] 
+
+        finalResults["mectizan"][area] += value["mectizan"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
+        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1) * 100
     }
 
     callback(finalResults, null);
@@ -388,11 +404,12 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
         console.log(new Date(prior))
 
-        reports = await Report.find( {'health_zone': health_zone_id, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
 
         console.log("Waiting for report " + reports.length);
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
+        return;
     }
  
     /*
@@ -406,15 +423,19 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
     for (rep of reports) {
 
-        var health_area = rep['health_area'];
+        var health_area_id = rep['health_area'];
+        // get health_area using health_area_id
+        var health_area = (await HealthArea.findById(health_area_id).exec()).name;
         var village = rep['village'];
 
-        var diseases = rep['diseases_treated'];
-        var treated = diseases['onchocerciasis'] > 0 ||
-                    diseases['lymphatic_filariasis'] > 0 ||
-                    diseases['schistosomiasis'] > 0 ||
-                    diseases['soil_transmitted_helminthiasis'] > 0 ||
-                    diseases['trachoma'] > 0;
+        var treated = rep['onchocerciasis']["first_round"] > 0 ||
+                    rep['onchocerciasis']["second_round"] > 0 ||
+                    rep['lymphatic_filariasis']["mectizan_and_albendazole"] > 0 ||
+                    rep['lymphatic_filariasis']["albendazole_alone"]["first_round"] > 0 ||
+                    rep['lymphatic_filariasis']["albendazole_alone"]["second_round"] > 0 ||
+                    rep['schistosomiasis'] > 0 ||
+                    rep['soil_transmitted_helminthiasis'] > 0 ||
+                    rep['trachoma'] > 0;
 
         console.log("Report found with vill " + village + " and treated status " + treated);
 
@@ -443,10 +464,10 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
     // go through each health area and compute percent treated
     for (const [area, value] of Object.entries(results)) {
-        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length)
+        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length) * 100
     }
 
-    callback({"village_coverage": finalResults}, null);
+    callback(finalResults, null);
 }
 
 const addTrainingForm = async function(req) {

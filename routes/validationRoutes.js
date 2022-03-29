@@ -1,30 +1,35 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const functions = require('../database/functions');
+const Report = require('../models/Report');
 const validationRouter = express.Router();
 
 /**
- * @api {post} /validation/<health_zone_id>/reports/validate validate list of reports from a health zone
+ * @api {post} /validation/<health_zone_id>/reports/validate validate a report
  */
-validationRouter.post('/:health_zone_id/reports/validate', (req, res) => {
+validationRouter.post('/reports/validate', async (req, res) => {
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
 
-    console.log("Validating Health Zone reports endpoint reached, and received following data: ");
-    console.log(req.body);
+    // make sure they are admin
+    if (req.user.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
 
-    // calls helper function
-    functions.validateHealthZoneReports(req.body).then(data => {
-        if (data.error != null) {
-            console.log("Error occurred when updating Health Zone reports: " + data.error);
-            res.status(500).send({
-                message: data.error.message || "Some error occurred when validating/updating health zone reports."
-            });
-        } else {
-            console.log("Validated/updated " + req.body.length + " health zone reports: ");
-            console.log(data.result);
-            res.status(200).send(data.result);
-        }
-    });
-
+    try {
+        const id = mongoose.Types.ObjectId(req.body._id);
+        const validatedReport = await Report.findByIdAndUpdate(id, {is_validated: true}, {new: true});
+        res.status(200).send(validatedReport);
+    } catch (err) {
+        console.log("Error occurred when validating report: " + err.message);
+        res.status(500).send({
+            message: err.message || "Some error occurred when validating report."
+        });
+    }
 });
 
 /**
@@ -32,19 +37,34 @@ validationRouter.post('/:health_zone_id/reports/validate', (req, res) => {
  */
  validationRouter.get('/:health_zone_id/reports', (req, res) => {
 
+    console.log("user", req.user);
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // make sure they are admin
+    if (req.user.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
+
     var health_zone_id = req.params.health_zone_id;
     // good test 1 - 618b21eb8453970bd916764c
 
     // call helper function
-    functions.getForms(health_zone_id, "unvalidated", (err, result) => {
+    functions.getForms(health_zone_id, "unvalidated",  (err, result) => {
         if (err == null) {
-            console.log("Found and returned " + result.length + " forms");
             res.status(200).send(result);
+            return;
         } else {
             console.log("Error getting forms for health zone: " + err);
-            res.status(500).send({
+            res.status(500).send({ 
                 message: err.message || "Some error occurred while receiving forms."
             });
+            return;
         }
     });
 });

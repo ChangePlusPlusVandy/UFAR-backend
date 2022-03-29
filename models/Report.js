@@ -14,6 +14,11 @@ const ReportSchema = new Schema({
         //ref: 'User'
     },
 
+    submitter: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+
     village: {
         type: Schema.Types.ObjectId,
         ref: 'Village'
@@ -86,31 +91,6 @@ const ReportSchema = new Schema({
         type: Boolean,
         default: false
     },
-
-    // 1.12 number of treatment cycles 
-    // todo: embeded within 1.11
-    // treatment_circles: {
-    //     onchocerciasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     lymphatic_filariasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     schistosomiasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     soil_transmitted_helminthiasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     trachoma: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    // },
 
     dcs_training_completion_date: {
         type: Date,

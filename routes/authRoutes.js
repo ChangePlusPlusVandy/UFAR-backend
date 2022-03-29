@@ -7,6 +7,7 @@ const authRouter = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+const uuid = require("uuid");
 
 /**
  * @api {post} /auth/register register a user
@@ -15,11 +16,19 @@ authRouter.post('/register', async function(req, res) {
     console.log('Test');
     console.log(req.body);
 
+    // Check if user already exists
+    var existingUser = await User.findOne({name: req.body.name});
+
     const token = await Register.findOne({ 'token': req.body.uuid, used: false, expiration: {"$gte": new Date()} });
 
     if (token == null) {
         res.status(500).send({
             message: "Please provide a valid token."
+        });
+        return;
+    } else if (existingUser != null) {
+        res.status(500).send({
+            message: "User already exists."
         });
         return;
     }
@@ -38,7 +47,8 @@ authRouter.post('/register', async function(req, res) {
     const user = new User({
         name: req.body.name,
         password: hash,
-        role: token.role
+        role: token.role,
+        health_zone: token.health_zone
     });
 
     user.save().then(result => {
@@ -46,6 +56,9 @@ authRouter.post('/register', async function(req, res) {
 
         token.used = true;
         token.save();
+        // todo: probably need to delete token from db after it's been used
+        // delete token from db
+        // token.deleteOne();
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Some error occurred while creating the User."
@@ -80,7 +93,9 @@ authRouter.post('/register', async function(req, res) {
         { 
             "user": {
                 "name": user.name,
-                "role": user.role
+                "role": user.role,
+                "health_zone": user.health_zone,
+                "_id": user._id
             }
         },
         process.env.JWT_SECRET,
@@ -90,7 +105,7 @@ authRouter.post('/register', async function(req, res) {
             "expiresIn": "7d",
         }
     )
-
+    console.log("token", token);
     res.status(200).send(token);
 });
 
@@ -98,49 +113,59 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/newuuid generates a new RegistrationToken instance
  */
  authRouter.post('/newuuid', async function(req, res) {
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // make sure they are admin
+    if (req.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return
+    }
+
+    console.log(req.user);
     console.log(req.body);
 
-    let authorized = true;
-
-    const user = await User.findOne({'name': req.body.name});
-    console.log(user);
-    if (user == null) {
-        authorized = false;
-    }
-
-    const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) {
-        authorized = false;
-    }
-
-    if (req.body.role != 'Admin') {
-        authorized = false;
-    }
-
-    if (!authorized) {
+    if (!req.user && req.user.user.role != 'Admin') {
         res.status(404).send({
             message: "User doesn't have required privileges/not authorized."
         });
         return;
     }
 
-    var expirationDate = new Date();
+    let expirationDate = new Date();
     expirationDate.setHours( expirationDate.getHours() + 2 );
 
     const newUUIDToken = new Register({
-        token: req.body.uuid,
+        token: uuid.v4(),
         expiration: expirationDate,
-        role: user.role,
-        used: true
-    });
+        role: req.body.role,
+        used: false,
+        health_zone: mongoose.Types.ObjectId(req.body.health_zone)
+    })
 
-    res.status(200).send(newUUIDToken);
+    newUUIDToken.save().then(result => {
+        console.log("Successfully generated a new UUID token: \n" + result);
+        res.status(200).send(result);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while creating the new UUID token."
+        });
+    });
 });
 
 /**
  * @api {post} /auth/updatepassword - update a user's password
  */
  authRouter.post('/update_password', async function(req, res) {
+
+    if (!req.user) {
+        res.status(401).send({
+        message: "User doesn't have required privileges/not authorized."});
+        return;
+    }
 
     // req format
     /*
@@ -158,11 +183,10 @@ authRouter.post('/register', async function(req, res) {
 
     */
 
-    var isAdmin = req.body.user.role == 'admin'; 
-    var user = req.body.user.name; 
+    var username = req.user.user.name; // if a normal user is sending request, this will be the username
     
-    if (isAdmin) {
-        user = req.body.user;
+    if (req.user.user.role.toLowerCase() == 'admin') {
+        username = req.body.username; // if admin is sending request, use the username provided
     }
 
     if (req.body.password == null) {
@@ -179,7 +203,7 @@ authRouter.post('/register', async function(req, res) {
     // https://www.npmjs.com/package/bcrypt
     // to check pw, bcrypt.compareSync(myPlaintextPassword, hash); // true
 
-    await UserModel.updateOne({ name: user }, { $set: { password: hash } }).catch(
+    await User.updateOne({ name: username }, { $set: { password: hash } }).catch(
         error => {
             console.log(error);
             res.status(500).send({
