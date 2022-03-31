@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const functions = require('../database/functions');
 const formRouter = express.Router();
+const TrainingForm = require('../models/TrainingForm');
 
 /**
  * @api {post} /form/insert insert a form
@@ -30,6 +31,42 @@ formRouter.post('/insert', (req, res) => {
 });
 
 /**
+ * @api {post} /form/insertTrainingForm insert a training form
+ */
+ formRouter.post('/insertTrainingForm', (req, res) => {
+     // todo: verify user
+    // call helper function
+    functions.addTrainingForm(req).then(result => {
+        console.log("Inserted training form");
+        res.status(200).send(result);
+    }).catch(err => {
+        console.log("Error inserting training form: " + err.message);
+        res.status(500).send({
+            message: err.message || "Some error occurred while inserting training form."
+        });
+    });
+});
+
+/**
+ * @api {post} /form/<reportingProvince_id>/getTrainingForm retrieves training forms of a province
+ */
+ formRouter.get('/:reportingProvince_id/getTrainingForms', (req, res) => {
+     // todo: verify user
+
+    var reportingProvince_id = mongoose.Types.ObjectId(req.params.reportingProvince_id);
+
+    TrainingForm.find({'reportingProvince': reportingProvince_id}).then(result => {
+        console.log("Retrieved " + result.length + " training forms");
+        res.status(200).send(result);
+    }).catch(err => {
+        console.log("Error retrieving training forms: " + err.message);
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving training forms."
+        });
+    });
+});
+
+/**
  * @api {post} /form/get_unvalidated
  */
  formRouter.get('/get_unvalidated', (req, res) => {
@@ -54,6 +91,5 @@ formRouter.post('/insert', (req, res) => {
         }
     }, req.user.user._id);
 });
-
 
 module.exports = formRouter;

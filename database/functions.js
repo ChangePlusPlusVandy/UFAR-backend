@@ -3,6 +3,7 @@ const HealthArea = require('../models/HealthArea');
 const HealthZone = require('../models/HealthZone');
 const Village = require('../models/Village');
 const Report = require('../models/Report');
+const TrainingForm = require('../models/TrainingForm');
 const mongoose = require('mongoose');
 
 //TODO: Move to own files
@@ -469,4 +470,30 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
     callback(finalResults, null);
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage };
+const addTrainingForm = async function(req) {
+        var rawBody = req.body;
+
+        if ('chiefName' in rawBody) {
+            if (rawBody.chiefName instanceof String) {
+                rawBody.chiefName = mongoose.Types.ObjectId(rawBody.chiefName);
+            }
+        }
+
+        if ('reportingProvince' in rawBody) {
+            if (rawBody.reportingProvince instanceof String) {
+                rawBody.reportingProvince = mongoose.Types.ObjectId(rawBody.reportingProvince);
+            }
+        }
+
+        if ('coordinatingProvince' in rawBody) {
+            if (rawBody.coordinatingProvince instanceof String) {
+                rawBody.coordinatingProvince = mongoose.Types.ObjectId(rawBody.coordinatingProvince);
+            }
+        }
+
+        var newTrainingForm = new TrainingForm(rawBody);
+
+        return newTrainingForm.save();
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm };
