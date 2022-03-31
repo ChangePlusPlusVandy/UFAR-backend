@@ -1,391 +1,391 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const TrainingFormSchema = new Schema({
-    date: {
-        type: Date,
-        default: Date.now()
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
+
+  // IDENTIFICATION
+  identification: {
+    chiefName: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
     },
 
-    // IDENTIFICATION
-    identification: {
-        chiefName: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-        },
-
-        contactNumber: {
-            type: Number,
-            required: true
-        },
-
-        identificationYear: {
-            type: Number,
-            required: true
-        },
-
-        reportingMonth: {
-            type: String,
-            required: true
-        },
-
-        reportingProvince: {
-            type: Schema.Types.ObjectId,
-            ref: 'Province',
-            required: true
-        },
-
-        coordinatingProvince: {
-            type: Schema.Types.ObjectId,
-            ref: 'Province',
-            required: true
-        },
-
-        supportingPartner: {
-            type: String,
-            required: true
-        },
-
-        ASNumber: {
-            type: Number,
-            required: true
-        },
-
-        numCommunities: {
-            type: Number,
-            required: true
-        },
-
-        mtnTreated: {
-            type: String,
-            required: true
-        },
+    contactNumber: {
+      type: Number,
+      required: false,
     },
 
-    //COVID SITUATION STATE
-    covidSituation:{
-        activeCovidCases: {
-            type: Number,
-            default: 0,
-        },
-        newActiveCovidCases: {
-            type: Number,
-            default: 0,
-        },
-        covidDeaths: {
-            type: Number,
-            default: 0,
-        }
+    identificationYear: {
+      type: Number,
+      required: false,
     },
 
-    //MEDICINAL SUPPLY
-    medicinalSupply: {
-        praziquantel: {
-          numPraziquantelRemaining:{
-                type: Number,
-                default: 0,
-          },
-          praziquantelArrivalDate:{
-                type: Date,
-                default: Date.now()
-          },
-          numPraziquantelReceived: {
-                type: Number,
-                default: 0,
-          },
-        },
-        ivermectin: {
-          numMectizanRemaining: {
-                type: Number,
-                default: 0,
-          },
-          ivermectinArrivalDate: {
-                type: Date,
-                default: Date.now()
-          }, 
-          numIvermectinReceived: {
-                type: Number,
-                default: 0,
-          },
-        },
-        albendazole: {
-          numAlbendazoleRemaining: {
-            type: Number,
-            default: 0,
-          },
-          albendazoleArrivalDate: {
-            type: Date,
-            default: Date.now()
-          },
-          numAlbendazoleReceived: {
-            type: Number,
-            default: 0,
-          },
-        },
+    reportingMonth: {
+      type: String,
+      required: false,
+    },
+
+    reportingProvince: {
+      type: Schema.Types.ObjectId,
+      ref: "Province",
+      required: false,
+    },
+
+    coordinatingProvince: {
+      type: Schema.Types.ObjectId,
+      ref: "Province",
+      required: false,
+    },
+
+    supportingPartner: {
+      type: String,
+      required: false,
+    },
+
+    ASNumber: {
+      type: Number,
+      required: false,
+    },
+
+    numCommunities: {
+      type: Number,
+      required: false,
+    },
+
+    mtnTreated: {
+      type: String,
+      required: false,
+    },
+  },
+
+  //COVID SITUATION STATE
+  covidSituation: {
+    activeCovidCases: {
+      type: Number,
+      default: 0,
+    },
+    newActiveCovidCases: {
+      type: Number,
+      default: 0,
+    },
+    covidDeaths: {
+      type: Number,
+      default: 0,
+    },
+  },
+
+  //MEDICINAL SUPPLY
+  medicinalSupply: {
+    praziquantel: {
+      numPraziquantelRemaining: {
+        type: Number,
+        default: 0,
       },
+      praziquantelArrivalDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      numPraziquantelReceived: {
+        type: Number,
+        default: 0,
+      },
+    },
+    ivermectin: {
+      numMectizanRemaining: {
+        type: Number,
+        default: 0,
+      },
+      ivermectinArrivalDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      numIvermectinReceived: {
+        type: Number,
+        default: 0,
+      },
+    },
+    albendazole: {
+      numAlbendazoleRemaining: {
+        type: Number,
+        default: 0,
+      },
+      albendazoleArrivalDate: {
+        type: Date,
+        default: Date.now(),
+      },
+      numAlbendazoleReceived: {
+        type: Number,
+        default: 0,
+      },
+    },
+  },
 
-    // FINANCIAL RESOURCES
-    financialResources: {
-        fundsArrived: {
-            type: String,
-            required: true
-        },
-
-        amountPlanning: {
-            type: Number,
-            default: 0
-        },
-
-        amountTraining: {
-            type: Number,
-            default: 0
-        },
-
-        amountESPM: {
-            type: Number,
-            default: 0
-        },
-
-        amountDMM: {
-            type: Number,
-            default: 0
-        },
-
-        amountSupervision: {
-            type: Number,
-            default: 0
-        },
-
-        amountManagement: {
-            type: Number,
-            default: 0
-        },
-
-        amountOther: {
-            type: Number,
-            default: 0
-        },
-
-        hasSupportingDocs: {
-            type: String,
-            required: true
-        },
+  // FINANCIAL RESOURCES
+  financialResources: {
+    fundsArrived: {
+      type: String,
+      required: false,
     },
 
-    // TRAINING OF TRAINERS
-    trainingOfTrainers: {
-        trainingParticipation: {
-            type: String,
-            required: true
-        },
-
-        trainingStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        trainingEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        numFemaleTrainers: {
-            type: Number,
-            default: 0
-        },
-
-        numMaleTrainers: {
-            type: Number,
-            default: 0
-        },
+    amountPlanning: {
+      type: Number,
+      default: 0,
     },
 
-    // IT TRAINING
-    trainingIT: {
-        organizedTrainingIT: {
-            type: String,
-            required: true
-        },
-        trainingITStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-        trainingITEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-        numMaleTrainersIT: {
-            type: Number,
-            default: 0
-        },
-        numFemaleTrainersIT: {
-            type: Number,
-            default: 0
-        },
-        organizedTrainingDC: {
-            type: String,
-            required: true
-        },
-        trainingDCStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-        trainingDCEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        numFemaleTrainersDC: {
-            type: Number,
-            default: 0
-        },
-        numMaleTrainersDC: {
-            type: Number,
-            default: 0
-        },
+    amountTraining: {
+      type: Number,
+      default: 0,
     },
 
-    // TRAINING SUPERVISION
-    trainingSupervision: {
-        supervisionDCTraining: {
-            type: String,
-            required: true
-        },
-
-        supervisionTrainingStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        supervisionTrainingEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        supervisionHierachyVisits: {
-            type: String
-        },
+    amountESPM: {
+      type: Number,
+      default: 0,
     },
 
-    // ESPM
-    ESPM: {
-        implementationESPM: {
-            type: String,
-            required: true
-        },
-        awarenessStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-        awarenessEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-        organizedDMMCeremony: {
-            type: String,
-            required: true
-        },
-        DMMStartDate: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
+    amountDMM: {
+      type: Number,
+      default: 0,
     },
 
-    // MASS DISTRIBUTION OF MEDICINAL PRODUCTS
-    massDistribution: {
-        ASDMMDebut: {
-            type: String,
-            required: true
-        },
-
-        LFOVSTHStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        LFOVSTHEndDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        SCHStartDate: {
-            type: Date,
-            default: Date.now()
-        },
-
-        SCHEndDate: {
-            type: Date,
-            default: Date.now()
-        },
+    amountSupervision: {
+      type: Number,
+      default: 0,
     },
 
-    // DMM SUPERVISION
-    DMMSupervision: {
-        ASDMMDebutDate: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
-
-        ASStartDate: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
-
-        DMMHierarchyVisits: {
-            type: String,
-            required: true
-        },
+    amountManagement: {
+      type: Number,
+      default: 0,
     },
 
-    // DATA VALIDATION
-    dataValidation: {
-        validationASStartDateZS: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
-
-        validationASEndDateZS: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
-
-        validationASStartDateCoordination: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
-
-        validationASEndDateCoordination: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        },
+    amountOther: {
+      type: Number,
+      default: 0,
     },
 
-    // PROCESSING START DATE
-    processing: {
-        encodingStartDate: {
-            type: String,
-            required: true
-        },
-
-        numVillagesAlreadyEncoded: {
-            type: Number,
-            required: true
-        },
-
-        formTransmissionDate: {
-            type: Date,
-            required: true,
-            default: Date.now()
-        }
+    hasSupportingDocs: {
+      type: String,
+      required: false,
     },
+  },
+
+  // TRAINING OF TRAINERS
+  trainingOfTrainers: {
+    trainingParticipation: {
+      type: String,
+      required: false,
+    },
+
+    trainingStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    trainingEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    numFemaleTrainers: {
+      type: Number,
+      default: 0,
+    },
+
+    numMaleTrainers: {
+      type: Number,
+      default: 0,
+    },
+  },
+
+  // IT TRAINING
+  trainingIT: {
+    organizedTrainingIT: {
+      type: String,
+      required: false,
+    },
+    trainingITStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    trainingITEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    numMaleTrainersIT: {
+      type: Number,
+      default: 0,
+    },
+    numFemaleTrainersIT: {
+      type: Number,
+      default: 0,
+    },
+    organizedTrainingDC: {
+      type: String,
+      required: false,
+    },
+    trainingDCStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    trainingDCEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    numFemaleTrainersDC: {
+      type: Number,
+      default: 0,
+    },
+    numMaleTrainersDC: {
+      type: Number,
+      default: 0,
+    },
+  },
+
+  // TRAINING SUPERVISION
+  trainingSupervision: {
+    supervisionDCTraining: {
+      type: String,
+      required: false,
+    },
+
+    supervisionTrainingStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    supervisionTrainingEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    supervisionHierachyVisits: {
+      type: String,
+    },
+  },
+
+  // ESPM
+  ESPM: {
+    implementationESPM: {
+      type: String,
+      required: false,
+    },
+    awarenessStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    awarenessEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+    organizedDMMCeremony: {
+      type: String,
+      required: false,
+    },
+    DMMStartDate: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+  },
+
+  // MASS DISTRIBUTION OF MEDICINAL PRODUCTS
+  massDistribution: {
+    ASDMMDebut: {
+      type: String,
+      required: false,
+    },
+
+    LFOVSTHStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    LFOVSTHEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    SCHStartDate: {
+      type: Date,
+      default: Date.now(),
+    },
+
+    SCHEndDate: {
+      type: Date,
+      default: Date.now(),
+    },
+  },
+
+  // DMM SUPERVISION
+  DMMSupervision: {
+    ASDMMDebutDate: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+
+    ASStartDate: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+
+    DMMHierarchyVisits: {
+      type: String,
+      required: false,
+    },
+  },
+
+  // DATA VALIDATION
+  dataValidation: {
+    validationASStartDateZS: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+
+    validationASEndDateZS: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+
+    validationASStartDateCoordination: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+
+    validationASEndDateCoordination: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+  },
+
+  // PROCESSING START DATE
+  processing: {
+    encodingStartDate: {
+      type: String,
+      required: false,
+    },
+
+    numVillagesAlreadyEncoded: {
+      type: Number,
+      required: false,
+    },
+
+    formTransmissionDate: {
+      type: Date,
+      required: false,
+      default: Date.now(),
+    },
+  },
 });
 
-module.exports = mongoose.model('TrainingForm', TrainingFormSchema);
+module.exports = mongoose.model("TrainingForm", TrainingFormSchema);

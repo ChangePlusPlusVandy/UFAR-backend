@@ -34,6 +34,7 @@ formRouter.post('/insert', (req, res) => {
  * @api {post} /form/insertTrainingForm insert a training form
  */
  formRouter.post('/insertTrainingForm', (req, res) => {
+     // todo: verify user
     // call helper function
     functions.addTrainingForm(req).then(result => {
         console.log("Inserted training form");
@@ -49,7 +50,8 @@ formRouter.post('/insert', (req, res) => {
 /**
  * @api {post} /form/<reportingProvince_id>/getTrainingForm retrieves training forms of a province
  */
- formRouter.post('/:reportingProvince_id/getTrainingForm', (req, res) => {
+ formRouter.get('/:reportingProvince_id/getTrainingForms', (req, res) => {
+     // todo: verify user
 
     var reportingProvince_id = mongoose.Types.ObjectId(req.params.reportingProvince_id);
 
