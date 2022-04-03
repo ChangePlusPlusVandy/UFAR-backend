@@ -5,8 +5,18 @@ const Village = require('../models/Village');
 const Report = require('../models/Report');
 const TrainingForm = require('../models/TrainingForm');
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 //TODO: Move to own files
+
+// checks if a string is a valid mongodb ObjectId or not
+const isValidObjectId = (id) => {
+    if (ObjectId.isValid(id)) {
+        if ((String)(new ObjectId(id)) === id) return true;
+        return false;
+    } 
+    return false
+}
 
 // this is actually unneeded bc it literally just returns its param copied
 const parseTreatmentCycles = (req) => {
@@ -215,6 +225,10 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
 // helper function for the drug data dashboard
 const getDrugData = async function(health_zone_id, numPastDays) { 
     try {
+        if (!isValidObjectId(health_zone_id)) {
+            return {result: null, error: {message: "Health zone id is not valid."}};
+        }
+
         // drugData object will hold the drug data
         const drugData = {};
 
@@ -222,6 +236,10 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         const healthZone = await HealthZone.find({"_id": health_zone_id}).populate({
             path: "health_areas"
         }).exec();
+
+        if (healthZone.length == 0) {
+            return {result: null, error: {message: "Health zone id does not exist."}};
+        }
 
         // health zone with health_zone_id as its id does not exist
         if (healthZone.length == 0) {
@@ -284,6 +302,10 @@ const getDrugData = async function(health_zone_id, numPastDays) {
 
 const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
+    if (!isValidObjectId(health_zone_id)) {
+        callback(null, {message: "Health zone id is not valid."});
+    }
+
     var reports
 
     try {
@@ -291,6 +313,11 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         const prior = current.setDate(current.getDate() - time);
 
         reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
+
+        if (reports.length == 0) {
+            callback(null, {message: "Health zone id does not exist."});
+        }
+
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
     }
@@ -396,6 +423,10 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
 const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
+    if (!isValidObjectId(health_zone_id)) {
+        callback(null, {message: "Health zone id is not valid."});
+    }
+
     var reports
 
     try {
@@ -405,6 +436,10 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
         console.log(new Date(prior))
 
         reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
+
+        if (reports.length == 0) {
+            callback(null, {message: "Health zone id does not exist."});
+        }
 
         console.log("Waiting for report " + reports.length);
     } catch(err) {

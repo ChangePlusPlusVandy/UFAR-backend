@@ -53,12 +53,7 @@ authRouter.post('/register', async function(req, res) {
 
     user.save().then(result => {
         res.status(201).send("User created successfully: " + result);
-
-        token.used = true;
-        token.save();
-        // todo: probably need to delete token from db after it's been used
-        // delete token from db
-        // token.deleteOne();
+        token.deleteOne();
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Some error occurred while creating the User."
@@ -120,7 +115,7 @@ authRouter.post('/register', async function(req, res) {
     }
 
     // make sure they are admin
-    if (req.user.role.toLowerCase() != 'admin') {
+    if (req.user.user.role.toLowerCase() != 'admin') {
         res.status(401).send("Authorized user must be an admin");
         return
     }
