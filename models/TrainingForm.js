@@ -10,9 +10,8 @@ const TrainingFormSchema = new Schema({
   // IDENTIFICATION
   identification: {
     chiefName: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
+      type: String,
+      required: true,
     },
 
     contactNumber: {
@@ -82,6 +81,10 @@ const TrainingFormSchema = new Schema({
   //MEDICINAL SUPPLY
   medicinalSupply: {
     praziquantel: {
+      praziquantelArrival: {
+        type: Number,
+        default: 0,
+      },
       numPraziquantelRemaining: {
         type: Number,
         default: 0,
@@ -96,6 +99,10 @@ const TrainingFormSchema = new Schema({
       },
     },
     ivermectin: {
+      ivermectinArrival: {
+        type: Number,
+        default: 0,
+      },
       numMectizanRemaining: {
         type: Number,
         default: 0,
@@ -110,6 +117,10 @@ const TrainingFormSchema = new Schema({
       },
     },
     albendazole: {
+      albendazoleArrival: {
+        type: Number,
+        default: 0,
+      },
       numAlbendazoleRemaining: {
         type: Number,
         default: 0,
@@ -175,11 +186,10 @@ const TrainingFormSchema = new Schema({
 
   // TRAINING OF TRAINERS
   trainingOfTrainers: {
-    trainingParticipation: {
+    isTrainingTrainers: {
       type: String,
       required: false,
     },
-
     trainingStartDate: {
       type: Date,
       default: Date.now(),

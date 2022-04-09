@@ -123,13 +123,6 @@ authRouter.post('/register', async function(req, res) {
     console.log(req.user);
     console.log(req.body);
 
-    if (!req.user && req.user.user.role != 'Admin') {
-        res.status(404).send({
-            message: "User doesn't have required privileges/not authorized."
-        });
-        return;
-    }
-
     let expirationDate = new Date();
     expirationDate.setHours( expirationDate.getHours() + 2 );
 
