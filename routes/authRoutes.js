@@ -110,7 +110,7 @@ authRouter.post('/register', async function(req, res) {
  authRouter.post('/newuuid', async function(req, res) {
 
     if (!req.user && req.user.user.role.toLowerCase != 'admin') {
-        res.status(404).send({
+        res.status(401).send({
             message: "User doesn't have required privileges/not authorized."
         });
         return;
