@@ -496,4 +496,29 @@ const addTrainingForm = async function(req) {
         return newTrainingForm.save();
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm };
+const editTrainingForm = async function(req) {
+    
+    try {    
+        var rawBody = req.body;
+
+        if (mongoose.Types.ObjectId.isValid(rawBody._id) && (String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
+
+            let parsedId = rawBody._id;
+
+            if (parsedId instanceof String) {
+                parsedId = mongoose.Types.ObjectId(parsedId)
+            }
+
+            const editedForm = await TrainingForm.findByIdAndUpdate(parsedId, rawBody, {new: true});
+
+            return {result: editedForm, error: null};
+
+        } else {
+            return {result: null, error: {message: "Training Form id is not valid."}};
+        }
+    } catch (err) {
+        return {result: null, error: err};
+    }
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm };
