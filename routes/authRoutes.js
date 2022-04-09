@@ -108,22 +108,8 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/newuuid generates a new RegistrationToken instance
  */
  authRouter.post('/newuuid', async function(req, res) {
-    // verify user
-    if (!req.user) {
-        res.status(401).send("Unauthorized user error");
-        return;
-    }
 
-    // make sure they are admin
-    if (req.user.user.role.toLowerCase() != 'admin') {
-        res.status(401).send("Authorized user must be an admin");
-        return
-    }
-
-    console.log(req.user);
-    console.log(req.body);
-
-    if (!req.user && req.user.user.role != 'Admin') {
+    if (!req.user && req.user.user.role.toLowerCase != 'admin') {
         res.status(404).send({
             message: "User doesn't have required privileges/not authorized."
         });

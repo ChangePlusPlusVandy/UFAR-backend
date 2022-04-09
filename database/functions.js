@@ -508,12 +508,6 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 const addTrainingForm = async function(req) {
         var rawBody = req.body;
 
-        if ('chiefName' in rawBody) {
-            if (rawBody.chiefName instanceof String) {
-                rawBody.chiefName = mongoose.Types.ObjectId(rawBody.chiefName);
-            }
-        }
-
         if ('reportingProvince' in rawBody) {
             if (rawBody.reportingProvince instanceof String) {
                 rawBody.reportingProvince = mongoose.Types.ObjectId(rawBody.reportingProvince);
