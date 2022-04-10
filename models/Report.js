@@ -61,7 +61,7 @@ const ReportSchema = new Schema({
     },
     
     lymphatic_filariasis: {
-        mectizan_and_albendazole: {
+        ivermectine_and_albendazole: {
             type: Boolean,
             default: false
         },
@@ -286,7 +286,7 @@ const ReportSchema = new Schema({
     },
 
     // IV. PROCESSING
-    mectizan: {
+    ivermectine: {
         men: {
             fiveToFourteen: {
                 type: Number,
@@ -311,7 +311,7 @@ const ReportSchema = new Schema({
         
     },
 
-    mectizan_and_albendazole: {
+    ivermectine_and_albendazole: {
         men: {
             fiveToFourteen: {
                 type: Number,
