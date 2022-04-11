@@ -168,49 +168,85 @@ const addReport = async function(req, callback) {
  */
 const getForms = function(health_zone_id, validation_status, callback, user="") {
 
-    // first we get the healthzone's villages
-    HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
-
-        if (err == null) {
-            if (!result) {
-                callback({
-                    message: "Could not find health zone with id " + health_zone_id
-                }, {});
-                return;
-            }
-
-            var findParams = {
-                "health_zone": result._id
-            };
-        
-            if (validation_status == "validated") findParams['is_validated'] = true;
-            if (validation_status == "unvalidated") findParams['is_validated'] = false;
-            if (user != "") {
-                if (user instanceof String) {
-                    user = mongoose.Types.ObjectId(user);
-                }
-                findParams['submitter'] = mongoose.Types.ObjectId(user);
-            }
-        
-            Report.find(findParams).exec(callback);   
-        } else {
-            callback("Error getting villages from health zone: " + err, result);
-        }
-    });   
-
-    /*
-    Code if we're storing health zone and health area in report (best search performance):
-
     var findParams = {
         health_zone: health_zone_id,
     };
 
     if (validation_status == "validated") findParams.push({'is_validated': true});
     if (validation_status == "unvalidated") findParams.push({'is_validated': false});
+    if (user != "") {
+        if (user instanceof String) {
+            user = mongoose.Types.ObjectId(user);
+        }
+        findParams['submitter'] = mongoose.Types.ObjectId(user);
+    }
 
     Report.find(findParams).exec(callback);   
-    */
+    
 }
+
+const getFormsAsCSV = function(findParams = {}) {
+
+    // Use https://www.npmjs.com/package/mongoose-to-csv
+
+    const cursor = Report.find(findParams);
+  
+    const transformer = (doc)=> {
+        return flatten(doc);
+    //   return {
+    //       Id: doc._id,
+    //       Name: doc.fullname,
+    //       Email: doc.email,
+    //       Type: doc.registration_type,
+    //       RegisterOn: doc.registered_on
+    //   };
+    }
+  
+    const filename = 'export.csv';
+  
+    res.setHeader('Content-disposition', `attachment; filename=${filename}`);
+    res.writeHead(200, { 'Content-Type': 'text/csv' });
+  
+    res.flushHeaders();
+  
+    var csvStream = fastCsv.createWriteStream({headers: true}).transform(transformer)
+    cursor.stream().pipe(csvStream).pipe(res);
+
+    res.save();
+
+
+    // Report.find(findParams).exec(callback);   
+    
+}
+
+// helper function for converting to CSV that I totally made myself
+function traverseAndFlatten(currentNode, target, flattenedKey) {
+    for (var key in currentNode) {
+        if (currentNode.hasOwnProperty(key)) {
+            var newKey;
+            if (flattenedKey === undefined) {
+                newKey = key;
+            } else {
+                newKey = flattenedKey + '.' + key;
+            }
+
+            var value = currentNode[key];
+            if (typeof value === "object") {
+                traverseAndFlatten(value, target, newKey);
+            } else {
+                target[newKey] = value;
+            }
+        }
+    }
+}
+
+function flatten(obj) {
+    var flattenedObject = {};
+    traverseAndFlatten(obj, flattenedObject);
+    return flattenedObject;
+}
+
+
 
 // helper function for the drug data dashboard
 const getDrugData = async function(health_zone_id, numPastDays) { 
@@ -496,4 +532,4 @@ const addTrainingForm = async function(req) {
         return newTrainingForm.save();
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, getFormsAsCSV };
