@@ -233,34 +233,47 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         earliestDate.setDate(earliestDate.getDate() - numPastDays);
 
         const reports = await Report.find({ health_zone: health_zone_id, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
+
         if (reports.length != 0) {
-            // these arrays hold the data about the drugs in the Drug Management section of a report
-            const drugsName = ["ivermectin", "albendazole", "praziquantel"];
-            const drugsUsed = [];
-            const drugsReceived = [];
-            
-            for (let i = 0; i < drugsName.length; i++) {
-                drugsUsed.push(0);
-                drugsReceived.push(0);
-            }
 
-            // get the drug data needed from each valid report
-            for (r in reports) {
-                report = reports[r];
+            const allHealthAreas = await HealthZone.find({"_id": health_zone_id}).populate({path: "health_areas" }).exec();
+
+            for (ha in allHealthAreas[0]["health_areas"]) {
+                const healthArea = allHealthAreas[0]["health_areas"][ha];
+                // these arrays hold the data about the drugs in the Drug Management section of a report
+                const drugsName = ["ivermectin", "albendazole", "praziquantel"];
+                const drugsUsed = [];
+                const drugsReceived = [];
+                
                 for (let i = 0; i < drugsName.length; i++) {
-                    let drug_management = drugsName[i] + "_management";
-                    drugsUsed[i] += report[drug_management]["quantityUsed"];
-                    drugsReceived[i] += report[drug_management]["quantityReceived"];
+                    drugsUsed.push(0);
+                    drugsReceived.push(0);
                 }
-            }
 
+                // get the drug data needed from each valid report
+                inner:
+                for (r in reports) {
+                    report = reports[r];
 
-            // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
-            drugData[healthArea.name] = {};
-            for (let i = 0; i < drugsName.length; i++) {
-                let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
-                console.log(drugPercentage);
-                drugData[healthArea.name][drugsName[i]] = drugPercentage;
+                    if (String(report["health_area"]) != String(healthArea._id)) {
+                        continue;
+                    }
+
+                    console.log("Passed, checking");
+
+                    for (let i = 0; i < drugsName.length; i++) {
+                        let drug_management = drugsName[i] + "_management";
+                        drugsUsed[i] += report[drug_management]["quantityUsed"];
+                        drugsReceived[i] += report[drug_management]["quantityReceived"];
+                    }
+                }
+
+                // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
+                drugData[healthArea.name] = {};
+                for (let i = 0; i < drugsName.length; i++) {
+                    let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
+                    drugData[healthArea.name][drugsName[i]] = drugPercentage;
+                }
             }
         }
         
