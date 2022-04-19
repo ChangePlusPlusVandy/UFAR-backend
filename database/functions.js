@@ -185,68 +185,42 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
     
 }
 
-const getFormsAsCSV = function(findParams = {}) {
-
-    // Use https://www.npmjs.com/package/mongoose-to-csv
-
-    const cursor = Report.find(findParams);
-  
-    const transformer = (doc)=> {
-        return flatten(doc);
-    //   return {
-    //       Id: doc._id,
-    //       Name: doc.fullname,
-    //       Email: doc.email,
-    //       Type: doc.registration_type,
-    //       RegisterOn: doc.registered_on
-    //   };
-    }
-  
-    const filename = 'export.csv';
-  
-    res.setHeader('Content-disposition', `attachment; filename=${filename}`);
-    res.writeHead(200, { 'Content-Type': 'text/csv' });
-  
-    res.flushHeaders();
-  
-    var csvStream = fastCsv.createWriteStream({headers: true}).transform(transformer)
-    cursor.stream().pipe(csvStream).pipe(res);
-
-    res.save();
-
-
-    // Report.find(findParams).exec(callback);   
-    
-}
-
-// helper function for converting to CSV that I totally made myself
-function traverseAndFlatten(currentNode, target, flattenedKey) {
-    for (var key in currentNode) {
-        if (currentNode.hasOwnProperty(key)) {
-            var newKey;
-            if (flattenedKey === undefined) {
-                newKey = key;
-            } else {
-                newKey = flattenedKey + '.' + key;
-            }
-
-            var value = currentNode[key];
-            if (typeof value === "object") {
-                traverseAndFlatten(value, target, newKey);
-            } else {
-                target[newKey] = value;
-            }
-        }
-    }
-}
-
 function flatten(obj) {
-    var flattenedObject = {};
-    traverseAndFlatten(obj, flattenedObject);
-    return flattenedObject;
+    var empty = true;
+    if (obj instanceof Array) {
+        str = '[';
+        empty = true;
+        for (var i=0;i<obj.length;i++) {
+            empty = false;
+            str += flatten(obj[i])+', ';
+        }
+        return (empty?str:str.slice(0,-2))+']';
+    } else if (obj instanceof Object) {
+        str = '{';
+        empty = true;
+        for (i in obj) {
+            empty = false;
+            str += i+'->'+flatten(obj[i])+', ';
+        }
+        return (empty?str:str.slice(0,-2))+'}';
+    } else {
+        return obj; // not an obj, don't stringify me
+    }
 }
 
+const Json2csvParser = require("json2csv").Parser;
+const fs = require("fs");
+const { time } = require('console');
 
+const getFormsAsCSV = async function(findParams = {}, 
+    writeStream = fs.createWriteStream('exports/reports-' + Date.now() + '.csv')) {
+
+    // from https://www.bezkoder.com/node-js-export-mongodb-csv-file/
+
+    Report.find({}).exec().then(function(docs) {
+      Report.csvReadStream(docs).pipe(writeStream);
+    });
+}
 
 // helper function for the drug data dashboard
 const getDrugData = async function(health_zone_id, numPastDays) { 

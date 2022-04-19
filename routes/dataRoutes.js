@@ -123,4 +123,29 @@ dataRouter.get('/locations', (req, res) => {
     });
 });
 
+/**
+ * @api {post} /data/download_forms
+ */
+ dataRouter.get('/download_forms', (req, res) => {
+
+    // verify user
+    /*
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+    */
+
+    res.statusCode = 200;
+    res.type('text/csv');
+    res.setHeader('Content-type', 'text/csv');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    // Header to force download
+    res.setHeader('Content-disposition', 'attachment; filename=Report.csv');
+
+    // call helper function to handle request
+    functions.getFormsAsCSV(req.body, res);
+});
+
 module.exports = dataRouter;

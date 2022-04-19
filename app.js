@@ -13,12 +13,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
-var myBlob = new Blob();
-var init = { "status" : 200 , "statusText" : "SuperSmashingGreat!" };
-var myResponse = new Response(myBlob,init);
-
 console.log("Testing form");
-functions.getFormsAsCSV({}, myResponse);
 
 const authMiddleware = expressJWT({
         secret: process.env.JWT_SECRET,
