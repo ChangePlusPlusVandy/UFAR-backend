@@ -232,18 +232,7 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         // drugData object will hold the drug data
         const drugData = {};
 
-        // // find health zone whose id is health_zone_id
-        // const healthZone = await HealthZone.find({"_id": health_zone_id}).populate({
-        //     path: "health_areas"
-        // }).exec();
-
-        // // health zone with health_zone_id as its id does not exist
-        // if (healthZone.length == 0) {
-        //     console.log("Could not find health zone with id " + health_zone_id);
-        //     return {result: drugData, error: null};
-        // }
-
-        // calculate the earliest date from which to get data from
+        
         const earliestDate = new Date();
         earliestDate.setDate(earliestDate.getDate() - numPastDays);
 
