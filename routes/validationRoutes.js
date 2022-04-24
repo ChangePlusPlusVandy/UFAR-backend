@@ -36,9 +36,6 @@ validationRouter.post('/reports/validate', async (req, res) => {
  * @api {post} /validation/<health_zone_id>/reports
  */
  validationRouter.get('/:health_zone_id/reports', (req, res) => {
-
-    console.log("user", req.user);
-
     // verify user
     if (!req.user) {
         res.status(401).send("Unauthorized user error");

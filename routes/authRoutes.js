@@ -13,8 +13,13 @@ const uuid = require("uuid");
  * @api {post} /auth/register register a user
  */
 authRouter.post('/register', async function(req, res) {
-    console.log('Test');
-    console.log(req.body);
+    
+    if (!req.body.name || !req.body.password || !req.body.uuid) {
+        res.status(400).send({
+            message: "name and/or password and/or token are required."
+        });
+        return;
+    }
 
     // Check if user already exists
     var existingUser = await User.findOne({name: req.body.name});
@@ -32,8 +37,6 @@ authRouter.post('/register', async function(req, res) {
         });
         return;
     }
-
-    console.log("Found valid token " + token);
 
     //const hash = bcrypt.hashSync(req.body.password, saltRounds);
 
@@ -53,12 +56,7 @@ authRouter.post('/register', async function(req, res) {
 
     user.save().then(result => {
         res.status(201).send("User created successfully: " + result);
-
-        token.used = true;
-        token.save();
-        // todo: probably need to delete token from db after it's been used
-        // delete token from db
-        // token.deleteOne();
+        token.deleteOne();
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Some error occurred while creating the User."
@@ -70,7 +68,13 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/login logs in a user
  */
  authRouter.post('/login', async function(req, res) {
-    console.log(req.body);
+    
+    if (!req.body.name || !req.body.password) {
+        res.status(400).send({
+            message: "Please provide name and/or password."
+        });
+        return;
+    }
 
     const user = await User.findOne({'name': req.body.name});
     console.log(user);
@@ -113,24 +117,19 @@ authRouter.post('/register', async function(req, res) {
  * @api {post} /auth/newuuid generates a new RegistrationToken instance
  */
  authRouter.post('/newuuid', async function(req, res) {
-    // verify user
-    if (!req.user) {
-        res.status(401).send("Unauthorized user error");
+
+    console.log("Generating new uuid");
+
+    if (!req.user && req.user.user.role.toLowerCase != 'admin') {
+        res.status(401).send({
+            message: "User doesn't have required privileges/not authorized."
+        });
         return;
     }
 
-    // make sure they are admin
-    if (req.user.role.toLowerCase() != 'admin') {
-        res.status(401).send("Authorized user must be an admin");
-        return
-    }
-
-    console.log(req.user);
-    console.log(req.body);
-
-    if (!req.user && req.user.user.role != 'Admin') {
-        res.status(404).send({
-            message: "User doesn't have required privileges/not authorized."
+    if (!req.body.role || !req.body.health_zone) {
+        res.status(400).send({
+            message: "Please provide a role and/or a health zone."
         });
         return;
     }
@@ -167,6 +166,13 @@ authRouter.post('/register', async function(req, res) {
         return;
     }
 
+    if (!req.body.password || !req.body.username) {
+        res.status(400).send({
+            message: "Please provide a new password and/or username."
+        });
+        return;
+    }
+
     // req format
     /*
     {
@@ -187,13 +193,6 @@ authRouter.post('/register', async function(req, res) {
     
     if (req.user.user.role.toLowerCase() == 'admin') {
         username = req.body.username; // if admin is sending request, use the username provided
-    }
-
-    if (req.body.password == null) {
-        res.status(500).send({
-            message: "Please provide a new password."
-        });
-        return;
     }
 
     const salt = await bcrypt.genSalt(10);

@@ -61,7 +61,7 @@ const ReportSchema = new Schema({
     },
     
     lymphatic_filariasis: {
-        mectizan_and_albendazole: {
+        ivermectine_and_albendazole: {
             type: Boolean,
             default: false
         },
@@ -91,31 +91,6 @@ const ReportSchema = new Schema({
         type: Boolean,
         default: false
     },
-
-    // 1.12 number of treatment cycles 
-    // todo: embeded within 1.11
-    // treatment_circles: {
-    //     onchocerciasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     lymphatic_filariasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     schistosomiasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     soil_transmitted_helminthiasis: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     trachoma: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    // },
 
     dcs_training_completion_date: {
         type: Date,
@@ -311,7 +286,7 @@ const ReportSchema = new Schema({
     },
 
     // IV. PROCESSING
-    mectizan: {
+    ivermectine: {
         men: {
             fiveToFourteen: {
                 type: Number,
@@ -336,7 +311,7 @@ const ReportSchema = new Schema({
         
     },
 
-    mectizan_and_albendazole: {
+    ivermectine_and_albendazole: {
         men: {
             fiveToFourteen: {
                 type: Number,

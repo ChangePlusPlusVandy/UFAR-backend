@@ -3,9 +3,20 @@ const HealthArea = require('../models/HealthArea');
 const HealthZone = require('../models/HealthZone');
 const Village = require('../models/Village');
 const Report = require('../models/Report');
+const TrainingForm = require('../models/TrainingForm');
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 //TODO: Move to own files
+
+// checks if a string is a valid mongodb ObjectId or not
+const isValidObjectId = (id) => {
+    if (ObjectId.isValid(id)) {
+        if ((String)(new ObjectId(id)) === id) return true;
+        return false;
+    } 
+    return false
+}
 
 // this is actually unneeded bc it literally just returns its param copied
 const parseTreatmentCycles = (req) => {
@@ -214,6 +225,10 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
 // helper function for the drug data dashboard
 const getDrugData = async function(health_zone_id, numPastDays) { 
     try {
+        if (!isValidObjectId(health_zone_id)) {
+            return {result: null, error: {message: "Health zone id is not valid."}};
+        }
+
         // drugData object will hold the drug data
         const drugData = {};
 
@@ -288,6 +303,11 @@ const getDrugData = async function(health_zone_id, numPastDays) {
 
 const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
+    if (!isValidObjectId(health_zone_id)) {
+        callback(null, {message: "Health zone id is not valid."});
+        return;
+    }
+
     var reports
 
     try {
@@ -295,23 +315,12 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         const prior = current.setDate(current.getDate() - time);
 
         reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
+
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
+        return;
     }
  
-    /*
-    will store in form 
- 
-    <healtharea>:
-        <enumerated_persons>:
-        <mectizan>:
-        <mectizan_and_albendazole>:            This is actually different than just adding them
-        <albendazole>:
-        <praziquantel>:   
-
-
-        
-    */
     const results = {}
 
     for (rep of reports) {
@@ -329,13 +338,13 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
                     patients['women']['fiveToFourteen'] + 
                     patients['women']['fifteenAndAbove'];
 
-        var mectizan = rep['mectizan']['men']['fiveToFourteen'] + rep['mectizan']['men']['fifteenAndOver'] +
-                       rep['mectizan']['women']['fiveToFourteen'] + rep['mectizan']['women']['fifteenAndOver']
+        var ivermectine = rep['ivermectine']['men']['fiveToFourteen'] + rep['ivermectine']['men']['fifteenAndOver'] +
+                       rep['ivermectine']['women']['fiveToFourteen'] + rep['ivermectine']['women']['fifteenAndOver']
 
-        var mectizan_and_albendazole = rep['mectizan_and_albendazole']['men']['fiveToFourteen'] +
-                                        rep['mectizan_and_albendazole']['men']['fifteenAndOver'] +
-                                        rep['mectizan_and_albendazole']['women']['fiveToFourteen'] +
-                                        rep['mectizan_and_albendazole']['women']['fifteenAndOver']
+        var ivermectine_and_albendazole = rep['ivermectine_and_albendazole']['men']['fiveToFourteen'] +
+                                        rep['ivermectine_and_albendazole']['men']['fifteenAndOver'] +
+                                        rep['ivermectine_and_albendazole']['women']['fiveToFourteen'] +
+                                        rep['ivermectine_and_albendazole']['women']['fifteenAndOver']
 
         var albendazole = rep['albendazole']['men']['fiveToFourteen'] +
                         rep['albendazole']['men']['fifteenAndOver'] +
@@ -348,8 +357,8 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         if (!(health_area in results)) {
             results[health_area] = {
                 'enumerated_persons': 0,
-                'mectizan': 0,
-                'mectizan_and_albendazole': 0,
+                'ivermectine': 0,
+                'ivermectine_and_albendazole': 0,
                 'albendazole': 0,
                 'praziquantel': 0    
             }
@@ -357,15 +366,15 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
         var toUpdate = results[health_area]
             toUpdate['enumerated_persons'] += enumerated_persons
-            toUpdate['mectizan'] += mectizan
-            toUpdate['mectizan_and_albendazole'] += mectizan_and_albendazole
+            toUpdate['ivermectine'] += ivermectine
+            toUpdate['ivermectine_and_albendazole'] += ivermectine_and_albendazole
             toUpdate['albendazole'] += albendazole
             toUpdate['praziquantel'] += praziquantel
     }
 
     const finalResults = {
-        "mectizan": {},
-        "mectizan_and_albendazole": {},
+        "ivermectine": {},
+        "ivermectine_and_albendazole": {},
         "praziquantel": {},
         "albendazole": {}
     }
@@ -375,11 +384,11 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         console.log("area", area);
         console.log("value", value);
 
-        if (!(area in finalResults["mectizan"])) {
-            finalResults["mectizan"][area] = 0
+        if (!(area in finalResults["ivermectine"])) {
+            finalResults["ivermectine"][area] = 0
         }
-        if (!(area in finalResults["mectizan_and_albendazole"])) {
-            finalResults["mectizan_and_albendazole"][area] = 0
+        if (!(area in finalResults["ivermectine_and_albendazole"])) {
+            finalResults["ivermectine_and_albendazole"][area] = 0
         }
         if (!(area in finalResults["praziquantel"])) {
             finalResults["praziquantel"][area] = 0
@@ -389,16 +398,22 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         }
 
 
-        finalResults["mectizan"][area] += value["mectizan"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
-        finalResults["mectizan_and_albendazole"][area] += value["mectizan_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["ivermectine"][area] += value["ivermectine"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
+        finalResults["ivermectine_and_albendazole"][area] += value["ivermectine_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
         finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1) * 100
         finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1) * 100
     }
 
     callback(finalResults, null);
+    return;
 }
 
 const getGeographicalCoverage = async function(health_zone_id, time, callback) {
+
+    if (!isValidObjectId(health_zone_id)) {
+        callback(null, {message: "Health zone id is not valid."});
+        return;
+    }
 
     var reports
 
@@ -434,7 +449,7 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
 
         var treated = rep['onchocerciasis']["first_round"] > 0 ||
                     rep['onchocerciasis']["second_round"] > 0 ||
-                    rep['lymphatic_filariasis']["mectizan_and_albendazole"] > 0 ||
+                    rep['lymphatic_filariasis']["ivermectine_and_albendazole"] > 0 ||
                     rep['lymphatic_filariasis']["albendazole_alone"]["first_round"] > 0 ||
                     rep['lymphatic_filariasis']["albendazole_alone"]["second_round"] > 0 ||
                     rep['schistosomiasis'] > 0 ||
@@ -472,6 +487,52 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
     }
 
     callback(finalResults, null);
+    return;
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage };
+const addTrainingForm = async function(req) {
+        var rawBody = req.body;
+
+        if ('reportingProvince' in rawBody) {
+            if (rawBody.reportingProvince instanceof String) {
+                rawBody.reportingProvince = mongoose.Types.ObjectId(rawBody.reportingProvince);
+            }
+        }
+
+        if ('coordinatingProvince' in rawBody) {
+            if (rawBody.coordinatingProvince instanceof String) {
+                rawBody.coordinatingProvince = mongoose.Types.ObjectId(rawBody.coordinatingProvince);
+            }
+        }
+
+        var newTrainingForm = new TrainingForm(rawBody);
+
+        return newTrainingForm.save();
+}
+
+const editTrainingForm = async function(req) {
+    
+    try {    
+        var rawBody = req.body;
+
+        if (mongoose.Types.ObjectId.isValid(rawBody._id) && (String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
+
+            let parsedId = rawBody._id;
+
+            if (parsedId instanceof String) {
+                parsedId = mongoose.Types.ObjectId(parsedId)
+            }
+
+            const editedForm = await TrainingForm.findByIdAndUpdate(parsedId, rawBody, {new: true});
+
+            return {result: editedForm, error: null};
+
+        } else {
+            return {result: null, error: {message: "Training Form id is not valid."}};
+        }
+    } catch (err) {
+        return {result: null, error: err};
+    }
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm };

@@ -73,7 +73,6 @@ dataRouter.get('/locations', (req, res) => {
         return;
     }
 
-    // todo: return error if health_zone_id is invalid or not provided
     var health_zone_id = req.params.health_zone_id;
     console.log("Received request for geographic coverage data from health zone with id: " + health_zone_id);
     // good test 1 - 618b21eb8453970bd916764c
@@ -105,8 +104,9 @@ dataRouter.get('/locations', (req, res) => {
         return;
     }
 
+    let health_zone_id = req.params.health_zone_id;
+
     // todo: return error if health_zone_id is invalid or not provided
-    let health_zone_id = mongoose.Types.ObjectId(req.params.health_zone_id);
     console.log("Received request for drug proportion data from health zone with id: " + health_zone_id);
 
     // call helper function
