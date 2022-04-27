@@ -506,6 +506,72 @@ ReportSchema.plugin(csv, {
       'Nurse': 'nurse',
       'submitter': 'submitter',
       'DMM_day': 'DMM_day',
+
+      // STARTING AT EXCEL COLUMN CC
+
+      // V. UNTREATED PERSONS
+      'PERSONNES_NON_TRAITEES.Enfants_<_5_ans': 'untreated_persons.childrenYoungerThanFive',
+      'PERSONNES_NON_TRAITEES.Fem_allaitante_<_7_jours': 'untreated_persons.breastfeedingWomen',
+      'PERSONNES_NON_TRAITEES.FG': 'untreated_persons.pregnantWomen',
+      'PERSONNES_NON_TRAITEES.Malade_grabataire': 'untreated_persons.bedriddenPatients',
+      'PERSONNES_NON_TRAITEES.Absent': 'untreated_persons.absent',
+      'PERSONNES_NON_TRAITEES.Refus': 'untreated_persons.refusals',
+
+      // VI. DRUG MANAGEMENT
+      'GESTION_DES_MEDICAMENTS.MECTIZAN.Reçus': 'ivermectin_management.quantityReceived',
+      'GESTION_DES_MEDICAMENTS.MECTIZAN.Utilisé': 'ivermectin_management.quantityUsed',
+      'GESTION_DES_MEDICAMENTS.MECTIZAN.Perdu': 'ivermectin_management.amountLost',
+    //   'GESTION_DES_MEDICAMENTS.MECTIZAN.Restant': ,
+      'GESTION_DES_MEDICAMENTS.MECTIZAN.Rendu_au_CS': 'ivermectin_management.quantityReturnedToCS',
+
+      'GESTION_DES_MEDICAMENTS.ALBENDAZOLE.Reçus': 'albendazole_management.quantityReceived',
+      'GESTION_DES_MEDICAMENTS.ALBENDAZOLE.Utilisé': 'albendazole_management.quantityUsed',
+      'GESTION_DES_MEDICAMENTS.ALBENDAZOLE.Perdu': 'albendazole_management.amountLost',
+    //   'GESTION_DES_MEDICAMENTS.ALBENDAZOLE.Restant': ,
+      'GESTION_DES_MEDICAMENTS.ALBENDAZOLE.Rendu_au_CS': 'albendazole_management.quantityReturnedToCS',
+
+      'GESTION_DES_MEDICAMENTS.PRAZIQUANTEL.Reçus': 'praziquantel_management.quantityReceived',
+      'GESTION_DES_MEDICAMENTS.PRAZIQUANTEL.Utilisé': 'praziquantel_management.quantityUsed',
+      'GESTION_DES_MEDICAMENTS.PRAZIQUANTEL.Perdu': 'praziquantel_management.amountLost',
+    //   'GESTION_DES_MEDICAMENTS.PRAZIQUANTEL.Restant': ,
+      'GESTION_DES_MEDICAMENTS.PRAZIQUANTEL.Rendu_au_CS': 'praziquantel_management.quantityReturnedToCS',
+
+    //   'GESTION_DES_MEDICAMENTS.POMMADE_TETRACYCLINE_1%.Reçus': ,
+    //   'GESTION_DES_MEDICAMENTS.POMMADE_TETRACYCLINE_1%.Utilisé': ,
+    //   'GESTION_DES_MEDICAMENTS.POMMADE_TETRACYCLINE_1%.Perdu': ,
+    //   'GESTION_DES_MEDICAMENTS.POMMADE_TETRACYCLINE_1%.Restant': ,
+    //   'GESTION_DES_MEDICAMENTS.POMMADE_TETRACYCLINE_1%.Rendu_au_CS': ,
+
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_SIROP.Reçus': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_SIROP.Utilisé': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_SIROP.Perdu': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_SIROP.Restant': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_SIROP.Rendu_au_CS': ,
+
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_COMPRIME.Reçus': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_COMPRIME.Utilisé': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_COMPRIME.Perdu': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_COMPRIME.Restant': ,
+    //   'GESTION_DES_MEDICAMENTS.AZITHROMYCINE_COMPRIME.Rendu_au_CS': ,
+        
+      // III. MORBIDITY
+      'COMPLICATIONS_ONCHOCERCOSE.AVEUGLE.HOMME': 'blind.men',
+      'COMPLICATIONS_ONCHOCERCOSE.AVEUGLE.FEMME': 'blind.women',
+    //   'COMPLICATIONS_ONCHOCERCOSE.AVEUGLE.TOTAL': ,
+
+    //   'COMPLICATIONS_FILARIOSE_LYMPHATIQUE.ELEPHANTIASIS.HOMME': ,
+    //   'COMPLICATIONS_FILARIOSE_LYMPHATIQUE.ELEPHANTIASIS.FEMME': ,
+    //   'COMPLICATIONS_FILARIOSE_LYMPHATIQUE.ELEPHANTIASIS.TOTAL': ,
+    //   'COMPLICATIONS_FILARIOSE_LYMPHATIQUE.HYDROCELE.TOTAL': ,
+
+      'COMPLICATIONS_TRACHOME.TRICHIASIS.HOMME': 'trichiasis.men',
+      'COMPLICATIONS_TRACHOME.TRICHIASIS.FEMME': 'trichiasis.women',
+    //   'COMPLICATIONS_TRACHOME.TRICHIASIS.TOTAL': ,
+
+      'RECHERCHE_VER_DE_GUINEE.HOMME': 'guinea_worm.men',
+      'RECHERCHE_VER_DE_GUINEE.FEMME': 'guinea_worm.women',
+    //   'RECHERCHE_VER_DE_GUINEE.TOTAL': ,
+
     },
     virtuals: {
       'Nurse': function(doc) {
