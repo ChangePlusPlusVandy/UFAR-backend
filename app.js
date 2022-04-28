@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
-console.log("Testing form");
 
 const authMiddleware = expressJWT({
         secret: process.env.JWT_SECRET,

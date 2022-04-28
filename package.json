@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "express-jwt": "^6.1.0",
     "fast-csv": "^4.3.6",
+    "json-2-csv": "^3.17.1",
     "json2csv": "^5.0.7",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.2",

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const csv = require('mongoose-to-csv');
 
 const ReportSchema = new Schema({
     // IDENTIFICATION
@@ -500,18 +499,28 @@ const ReportSchema = new Schema({
 
 });
 
-ReportSchema.plugin(csv, {
-    headers: 'Nurse Submitter DMM_day Nurse NURSETHREE',
-    alias: {
-      'Nurse': 'nurse',
-      'submitter': 'submitter',
-      'DMM_day': 'DMM_day',
-    },
-    virtuals: {
-      'Nurse': function(doc) {
-        return doc.nurse;
-      },
-    }
-});
+// Not acturally needed now
+// ReportSchema.plugin(csv, {
+//     headers: 'Nurse Submitter DMM_day Nurse NURSETHREE LessSix LessSixVirt',
+//     alias: {
+//       'LessSix': 'patients.men.lessThanSixMonth',
+//       'submitter': 'submitter',
+//       'DMM_day': 'DMM_day',
+//       'Village': 'village',
+//       'Province': 'province',
+//       'Health Area': 'health_area',
+//       'Health Zone': 'health_zone',
+//       'Date': 'date',
+      
+//     },
+//     virtuals: {
+//       'Nurse': function(doc) {
+//         return doc.nurse;
+//       },
+//       'LessSixVirt': function(doc) {
+//         return doc.patients.men.lessThanSixMonths;
+//       },
+//     }
+// });
 
 module.exports = mongoose.model('Report', ReportSchema);

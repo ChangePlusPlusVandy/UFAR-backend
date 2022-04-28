@@ -212,13 +212,28 @@ const Json2csvParser = require("json2csv").Parser;
 const fs = require("fs");
 const { time } = require('console');
 
-const getFormsAsCSV = async function(findParams = {}, 
-    writeStream = fs.createWriteStream('exports/reports-' + Date.now() + '.csv')) {
+// writeStream = fs.createWriteStream('exports/reports-' + Date.now() + '.csv')
+const getFormsAsCSV = async function(findParams = {}, res) {
 
     // from https://www.bezkoder.com/node-js-export-mongodb-csv-file/
 
-    Report.find({}).exec().then(function(docs) {
-      Report.csvReadStream(docs).pipe(writeStream);
+    let converter = require('json-2-csv');
+
+    let reports = []
+
+    await Report.find({}).exec().then(function(docs) {
+
+        for (i in docs) {
+            reports.push(docs[i]._doc)
+            console.log(docs[i]._doc)
+        }
+
+      // Report.csvReadStream(docs).pipe(writeStream);
+    });
+
+    converter.json2csv(reports, (err, csv) => {
+        console.log("CSV File generated")
+        res.status(200).send(csv);
     });
 }
 

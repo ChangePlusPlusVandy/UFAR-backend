@@ -144,6 +144,7 @@ dataRouter.get('/locations', (req, res) => {
     // Header to force download
     res.setHeader('Content-disposition', 'attachment; filename=Report.csv');
 
+
     // call helper function to handle request
     functions.getFormsAsCSV(req.body, res);
 });
