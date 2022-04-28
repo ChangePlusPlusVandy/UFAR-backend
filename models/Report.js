@@ -499,28 +499,4 @@ const ReportSchema = new Schema({
 
 });
 
-// Not acturally needed now
-// ReportSchema.plugin(csv, {
-//     headers: 'Nurse Submitter DMM_day Nurse NURSETHREE LessSix LessSixVirt',
-//     alias: {
-//       'LessSix': 'patients.men.lessThanSixMonth',
-//       'submitter': 'submitter',
-//       'DMM_day': 'DMM_day',
-//       'Village': 'village',
-//       'Province': 'province',
-//       'Health Area': 'health_area',
-//       'Health Zone': 'health_zone',
-//       'Date': 'date',
-      
-//     },
-//     virtuals: {
-//       'Nurse': function(doc) {
-//         return doc.nurse;
-//       },
-//       'LessSixVirt': function(doc) {
-//         return doc.patients.men.lessThanSixMonths;
-//       },
-//     }
-// });
-
 module.exports = mongoose.model('Report', ReportSchema);
