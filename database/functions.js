@@ -232,34 +232,21 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         // drugData object will hold the drug data
         const drugData = {};
 
-        // find health zone whose id is health_zone_id
-        const healthZone = await HealthZone.find({"_id": health_zone_id}).populate({
-            path: "health_areas"
-        }).exec();
-
-        if (healthZone.length == 0) {
-            return {result: null, error: {message: "Health zone id does not exist."}};
-        }
-
-        // health zone with health_zone_id as its id does not exist
-        if (healthZone.length == 0) {
-            console.log("Could not find health zone with id " + health_zone_id);
-            return {result: drugData, error: null};
-        }
-
-        // calculate the earliest date from which to get data from
+        
         const earliestDate = new Date();
         earliestDate.setDate(earliestDate.getDate() - numPastDays);
 
-        // iterate through every health area in the health zone
-        for (h in healthZone[0]["health_areas"]) {
-            let healthArea = healthZone[0]["health_areas"][h];
+        const reports = await Report.find({ health_zone: health_zone_id, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
 
-            // find all reports that are for all the villages in the health area, are validated, and are from the past specified dates
-            // console.log("date: " + earliestDate);
-            // every report instance has a health_area property. We implemented to the rendundancy to reducy queries to the database
-            const reports = await Report.find({ health_area: healthArea, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
-            if (reports.length != 0) {
+        if (reports.length != 0) {
+
+            const allHealthAreas = await HealthZone.find({"_id": health_zone_id}).populate({path: "health_areas" }).exec();
+
+            // console.log("health areas:", allHealthAreas[0]["health_areas"]);
+
+            for (ha in allHealthAreas[0]["health_areas"]) {
+                const healthArea = allHealthAreas[0]["health_areas"][ha];
+
                 // these arrays hold the data about the drugs in the Drug Management section of a report
                 const drugsName = ["ivermectin", "albendazole", "praziquantel"];
                 const drugsUsed = [];
@@ -271,8 +258,16 @@ const getDrugData = async function(health_zone_id, numPastDays) {
                 }
 
                 // get the drug data needed from each valid report
+                inner:
                 for (r in reports) {
                     report = reports[r];
+
+                    if (String(report["health_area"]) != String(healthArea._id)) {
+                        continue;
+                    }
+
+                    console.log("Passed, checking");
+
                     for (let i = 0; i < drugsName.length; i++) {
                         let drug_management = drugsName[i] + "_management";
                         drugsUsed[i] += report[drug_management]["quantityUsed"];
@@ -280,13 +275,16 @@ const getDrugData = async function(health_zone_id, numPastDays) {
                     }
                 }
 
-
                 // calculate the drug percentages/proportions used for each drug for a health area, and update drugData object
                 drugData[healthArea.name] = {};
                 for (let i = 0; i < drugsName.length; i++) {
                     let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
-                    console.log(drugPercentage);
                     drugData[healthArea.name][drugsName[i]] = drugPercentage;
+                }
+
+                // remove a health area if it has no data
+                if (drugData[healthArea.name]["albendazole"] == 0 && drugData[healthArea.name]["praziquantel"] == 0 && drugData[healthArea.name]["ivermectin"] == 0) {
+                    delete drugData[healthArea.name];
                 }
             }
         }
