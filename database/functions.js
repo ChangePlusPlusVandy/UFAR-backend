@@ -242,8 +242,11 @@ const getDrugData = async function(health_zone_id, numPastDays) {
 
             const allHealthAreas = await HealthZone.find({"_id": health_zone_id}).populate({path: "health_areas" }).exec();
 
+            // console.log("health areas:", allHealthAreas[0]["health_areas"]);
+
             for (ha in allHealthAreas[0]["health_areas"]) {
                 const healthArea = allHealthAreas[0]["health_areas"][ha];
+
                 // these arrays hold the data about the drugs in the Drug Management section of a report
                 const drugsName = ["ivermectin", "albendazole", "praziquantel"];
                 const drugsUsed = [];
@@ -277,6 +280,11 @@ const getDrugData = async function(health_zone_id, numPastDays) {
                 for (let i = 0; i < drugsName.length; i++) {
                     let drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i]||1) * 100);
                     drugData[healthArea.name][drugsName[i]] = drugPercentage;
+                }
+
+                // remove a health area if it has no data
+                if (drugData[healthArea.name]["albendazole"] == 0 && drugData[healthArea.name]["praziquantel"] == 0 && drugData[healthArea.name]["ivermectin"] == 0) {
+                    delete drugData[healthArea.name];
                 }
             }
         }
