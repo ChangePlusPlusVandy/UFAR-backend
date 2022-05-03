@@ -113,7 +113,7 @@ formRouter.post('/insert', (req, res) => {
 
     // handle w/ helper
 
-    functions.getForms(req.user.user.health_zone, "unvalidated", (err, result) => {
+    functions.getForms(req.user.user.health_zone.id, "unvalidated", (err, result) => {
         if (err == null) {
             console.log("Found and returned " + result?.length + " forms");
             res.status(200).send(result);
