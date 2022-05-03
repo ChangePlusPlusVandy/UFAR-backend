@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const HeathZone = require('../models/HealthZone');
 const Register = require('../models/RegistrationToken');
 const authRouter = express.Router();
 
@@ -93,12 +94,17 @@ authRouter.post('/register', async function(req, res) {
         return;
     }
 
+    const health_zone = await HeathZone.findOne({'_id': user.health_zone});
+
     const token = jwt.sign(
         { 
             "user": {
                 "name": user.name,
                 "role": user.role,
-                "health_zone": user.health_zone,
+                "health_zone": {
+                    "id": health_zone._id,
+                    "name": health_zone.name
+                },
                 "_id": user._id
             }
         },
