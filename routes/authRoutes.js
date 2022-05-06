@@ -140,9 +140,12 @@ authRouter.post('/register', async function(req, res) {
         return;
     }
 
-    let expirationDate = new Date();
-    expirationDate.setHours( expirationDate.getHours() + 2 );
+    // delete all tokens that have passed their expiration date
+    await Register.deleteMany({ expiration: {"$lt": new Date()} });
 
+    // generate new token with correct expiration date
+    let expirationDate = new Date();
+    expirationDate.setDate( expirationDate.getDate() + req.body.days );
     const newUUIDToken = new Register({
         token: uuid.v4(),
         expiration: expirationDate,
@@ -151,6 +154,7 @@ authRouter.post('/register', async function(req, res) {
         health_zone: mongoose.Types.ObjectId(req.body.health_zone)
     })
 
+    // save new token
     newUUIDToken.save().then(result => {
         console.log("Successfully generated a new UUID token: \n" + result);
         res.status(200).send(result);
