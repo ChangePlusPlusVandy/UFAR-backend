@@ -144,8 +144,7 @@ authRouter.post('/register', async function(req, res) {
     await Register.deleteMany({ expiration: {"$lt": new Date()} });
 
     // generate new token with correct expiration date
-    let expirationDate = new Date();
-    expirationDate.setDate( expirationDate.getDate() + req.body.days );
+    let expirationDate = new Date(req.body.expiration_date);
     const newUUIDToken = new Register({
         token: uuid.v4(),
         expiration: expirationDate,
