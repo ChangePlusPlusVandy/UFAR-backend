@@ -221,18 +221,82 @@ const getFormsAsCSV = async function(findParams = {}, res) {
 
     let reports = []
 
+    // todo:
+    // change order of fields to order of fields in the form
+    var fields = ['DMM_day', 'province', 'health_zone', 'health_area', 'village', 'date', 
+    
+                // todo: treatment cycles: missing
+
+                'MDD_start_date', 'MDD_end_date', 'distributors', 'patients', 'households', 
+
+                // Diseases Treated (Traitement)
+                'onchocerciasis', 'lymphatic_filariasis', 'schistosomiasis', 'soil_transmitted_helminthiasis',
+                'trachoma', 
+
+                'dcs_training_completion_date',
+                'medicines_arrival_date',
+                'date_of_transmission',
+
+                // morbidity
+                'blind',
+                'lymphedema',
+                'hydroceles',
+                'trichiasis',
+                'guinea_worm',
+
+                // Processing
+                'mectizan',
+                'mectizan_and_albendazole',
+                'albendazole',
+                'praziquantel',
+                'albendazole_soil_transmitted',
+                'side_effects_num',
+
+                        
+                //untreated persons
+                'untreated_persons',
+
+
+                // drug management
+                'ivermectin_management',
+                'albendazole_management',
+                'praziquantel_management',
+    ];
+
     await Report.find({}).exec().then(function(docs) {
 
         for (i in docs) {
             reports.push(docs[i]._doc)
-            console.log(docs[i]._doc)
+            // todo: reports.push(JSON.parse(JSON.stringify(docs[i]._doc, fields)))
         }
+
+        // todo:
+        // replace references to health_area, health_zone, and village with their names
+        // replace references to submitter with their names
 
       // Report.csvReadStream(docs).pipe(writeStream);
     });
 
+   
+
+    // var opts = {
+    //     fields
+    //     // https://www.npmjs.com/package/json-2-csv
+    //     // exceludeKeys - specify keys to exclude from the csv (sent_to_kobo, _v)
+    // };
+
+
+    // converter.json2csv(reports, opts, function(err, csv) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     res.setHeader('Content-disposition', 'attachment; filename=reports.csv');
+    //     res.set('Content-Type', 'text/csv');
+    //     res.status(200).send(csv);
+    // });
+
     converter.json2csv(reports, (err, csv) => {
-        console.log("CSV File generated")
+        console.log("CSV File generated");
         res.status(200).send(csv);
     });
 }

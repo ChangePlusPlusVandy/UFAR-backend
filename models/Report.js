@@ -492,7 +492,7 @@ const ReportSchema = new Schema({
         default: false
     },
 
-    sent_to_kobo: {
+    sent_to_kobo: { // todo: delete (not used anymore)
         type: Boolean,
         default: false
     }
