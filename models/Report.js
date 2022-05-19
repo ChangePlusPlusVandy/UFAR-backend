@@ -48,7 +48,6 @@ const ReportSchema = new Schema({
   },
 
   // 1.11 diseases treated
-
   // not needed, may as well be in next section
   onchocerciasis: {
     first_round: {
@@ -91,6 +90,30 @@ const ReportSchema = new Schema({
   trachoma: {
     type: Boolean,
     default: false,
+  },
+
+  // 1.12 Number of Treatment Cycles
+  numTreatmentCycles: {
+    onchocerciasis:{
+        type: Number,
+        default: 0,
+    },
+    lymphatic_filariasis:{
+        type: Number,
+        default: 0,
+    },
+    schistosomiasis:{
+        type: Number,
+        default: 0,
+    },
+    soil_transmitted_helminthiasis:{
+        type: Number,
+        default: 0,
+    },
+    trachoma:{
+        type: Number,
+        default: 0,
+    }
   },
 
   dcs_training_completion_date: {
