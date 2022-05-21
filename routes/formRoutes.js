@@ -34,7 +34,12 @@ formRouter.post('/insert', (req, res) => {
  * @api {post} /form/insertTrainingForm insert a training form
  */
  formRouter.post('/insertTrainingForm', (req, res) => {
-     // todo: verify user
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error"); 
+        return;
+    }
+
     // call helper function
     functions.addTrainingForm(req).then(result => {
         console.log("Inserted training form");
@@ -51,7 +56,11 @@ formRouter.post('/insert', (req, res) => {
  * @api {post} /form/<reportingProvince_id>/getTrainingForm retrieves training forms of a province
  */
  formRouter.get('/:reportingProvince_id/getTrainingForms', (req, res) => {
-     // todo: verify user
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error"); 
+        return;
+    }
 
     var reportingProvince_id = mongoose.Types.ObjectId(req.params.reportingProvince_id);
 
@@ -63,6 +72,31 @@ formRouter.post('/insert', (req, res) => {
         res.status(500).send({
             message: err.message || "Some error occurred while retrieving training forms."
         });
+    });
+});
+
+/**
+ * @api {post} /form/editTrainingForm edit a training form
+ */
+ formRouter.post('/editTrainingForm', (req, res) => {
+
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // call helper function
+    functions.editTrainingForm(req).then(data => {
+        if (data.error != null) {
+            console.log("Error editing training form: " + data.error.message);
+            res.status(500).send({
+                message: data.error.message || "Some error occurred while editing training form."
+            });
+        } else {
+            console.log("Edited training form with id " + req.body._id);
+            res.status(200).send(data.result);
+        }
     });
 });
 
@@ -79,7 +113,7 @@ formRouter.post('/insert', (req, res) => {
 
     // handle w/ helper
 
-    functions.getForms(req.user.user.health_zone, "unvalidated", (err, result) => {
+    functions.getForms(req.user.user.health_zone.id, "unvalidated", (err, result) => {
         if (err == null) {
             console.log("Found and returned " + result?.length + " forms");
             res.status(200).send(result);
