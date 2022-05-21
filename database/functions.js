@@ -338,6 +338,10 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
                     patients['women']['sixMonthsToFiveYears'] + 
                     patients['women']['fiveToFourteen'] + 
                     patients['women']['fifteenAndAbove'];
+        
+        var enumerated_children = 
+                    patients['men']['fiveToFourteen'] + 
+                    patients['women']['fiveToFourteen'];
 
         var ivermectine = rep['ivermectine']['men']['fiveToFourteen'] + rep['ivermectine']['men']['fifteenAndOver'] +
                        rep['ivermectine']['women']['fiveToFourteen'] + rep['ivermectine']['women']['fifteenAndOver']
@@ -348,9 +352,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
                                         rep['ivermectine_and_albendazole']['women']['fifteenAndOver']
 
         var albendazole = rep['albendazole']['men']['fiveToFourteen'] +
-                        rep['albendazole']['men']['fifteenAndOver'] +
-                        rep['albendazole']['women']['fiveToFourteen'] +
-                        rep['albendazole']['women']['fifteenAndOver']
+                        rep['albendazole']['women']['fiveToFourteen']
 
         var praziquantel = rep['praziquantel']['men']['fiveToFourteen'] +
                         rep['praziquantel']['women']['fiveToFourteen'] 
@@ -358,6 +360,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
         if (!(health_area in results)) {
             results[health_area] = {
                 'enumerated_persons': 0,
+                'enumerated_children': 0,
                 'ivermectine': 0,
                 'ivermectine_and_albendazole': 0,
                 'albendazole': 0,
@@ -367,6 +370,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
         var toUpdate = results[health_area]
             toUpdate['enumerated_persons'] += enumerated_persons
+            toUpdate['enumerated_children'] += enumerated_children
             toUpdate['ivermectine'] += ivermectine
             toUpdate['ivermectine_and_albendazole'] += ivermectine_and_albendazole
             toUpdate['albendazole'] += albendazole
@@ -401,8 +405,8 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
 
         finalResults["ivermectine"][area] += value["ivermectine"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
         finalResults["ivermectine_and_albendazole"][area] += value["ivermectine_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
-        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_persons"] || 1) * 100
-        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_persons"] || 1) * 100
+        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_children"] || 1) * 100
+        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_children"] || 1) * 100
     }
 
     callback(finalResults, null);
