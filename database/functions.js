@@ -172,11 +172,10 @@ const addReport = async function(req, callback) {
 /**
  * 
  * @param {*} health_zone_id The health zone the forms belong to
- * @param {*} validation_status "validated", "unvalidated", or "" depending on what types of forms are desired
  * @param {*} user The user that created the token. Blank for all users
  * @param {*} callback The callback to send to once the request has been completed (error or not)
  */
-const getForms = function(health_zone_id, validation_status, callback, user="") {
+const getForms = function(health_zone_id, callback, user="") {
 
     // first we get the healthzone's villages
     HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
@@ -190,11 +189,16 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
             }
 
             var findParams = {
-                "health_zone": result._id
+                "health_zone": result._id,
+                "$or": [
+                    {"is_validated": false},
+                    {"$and": [
+                        {"is_validated": true}, 
+                        {"is_archived": false}
+                    ]}
+                ]
             };
         
-            if (validation_status == "validated") findParams['is_validated'] = true;
-            if (validation_status == "unvalidated") findParams['is_validated'] = false;
             if (user != "") {
                 if (user instanceof String) {
                     user = mongoose.Types.ObjectId(user);
@@ -532,4 +536,18 @@ const editTrainingForm = async function(req) {
     }
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm };
+const getArchivedForms = async function(health_zone_id) { 
+    try {
+        if (!isValidObjectId(health_zone_id)) {
+            return {result: null, error: {message: "Health zone id is not valid."}};
+        }
+
+        const archivedReports = await Report.find({ health_zone: health_zone_id, is_archived: true});
+        return {result: archivedReports, error: null};
+
+    } catch(err) {
+        return {result: null, error: err};
+    }
+}
+
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm, getArchivedForms };

@@ -52,7 +52,7 @@ validationRouter.post('/reports/validate', async (req, res) => {
     // good test 1 - 618b21eb8453970bd916764c
 
     // call helper function
-    functions.getForms(health_zone_id, "unvalidated",  (err, result) => {
+    functions.getForms(health_zone_id, (err, result) => {
         if (err == null) {
             res.status(200).send(result);
             return;

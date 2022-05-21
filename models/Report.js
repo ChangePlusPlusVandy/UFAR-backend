@@ -486,13 +486,13 @@ const ReportSchema = new Schema({
         },        
     },
 
-    // VII.  VALIDATION AND KOBO
+    // VII.  VALIDATION AND ARCHIVING
     is_validated: {
         type: Boolean,
         default: false
     },
 
-    sent_to_kobo: {
+    is_archived: {
         type: Boolean,
         default: false
     }

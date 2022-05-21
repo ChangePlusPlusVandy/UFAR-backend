@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const functions = require('../database/functions');
 const dataRouter = express.Router();
+const Report = require('../models/Report');
 
 const { formatLocationData } = require('../database/functions');
 
@@ -123,5 +124,66 @@ dataRouter.get('/locations', (req, res) => {
         }
     });
 });
+
+/**
+ * @api {post} /data/reports/archive archive a report
+ */
+ dataRouter.post('/reports/archive', async (req, res) => {
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // make sure they are admin
+    if (req.user.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
+
+    try {
+        const id = mongoose.Types.ObjectId(req.body._id);
+        const archivedReport = await Report.findByIdAndUpdate(id, {is_archived: true}, {new: true});
+        res.status(200).send(archivedReport);
+    } catch (err) {
+        console.log("Error occurred when archiving report: " + err.message);
+        res.status(500).send({
+            message: err.message || "Some error occurred when archiving report."
+        });
+    }
+});
+
+/**
+ * @api {get} /data/<health_zone_id>/archivedReports get all archived reports of a specific health zone
+ */
+ dataRouter.get('/:health_zone_id/archivedReports', (req, res) => {
+    // verify user
+    if (!req.user) {
+        res.status(401).send("Unauthorized user error");
+        return;
+    }
+
+    // make sure they are admin
+    if (req.user.user.role.toLowerCase() != 'admin') {
+        res.status(401).send("Authorized user must be an admin");
+        return;
+    }
+
+    var health_zone_id = req.params.health_zone_id;
+
+    // call helper function
+    functions.getArchivedForms(health_zone_id).then(data => {
+        if (data.error != null) {
+            console.log("Error getting archived reports for health zone: " + data.error);
+            res.status(500).send({
+                message: data.error.message || "Some error occurred while getting the archived reports."
+            });
+        } else {
+            console.log("Found and returned archived reports from health zone");
+            res.status(200).send(data.result);
+        }
+    });
+});
+
 
 module.exports = dataRouter;
