@@ -231,63 +231,67 @@ const getFormsAsCSV = async function(findParams = {}, res) {
 
     let reports = []
 
-    // todo:
-    // change order of fields to order of fields in the form
-    var fields = ['DMM_day', 'province', 'health_zone', 'health_area', 'village', 'date', 
-    
+   
+    const customOrderAndDereference = async (report) => {
 
-                'MDD_start_date', 'MDD_end_date', 'distributors', 'patients', 'households', 
+        return {
+            'DMM_day': new Date(report.DMM_day).toLocaleDateString(),
+            'province': (await Province.findById(report.province)).name,
+            'health_zone': (await HealthZone.findById(report.health_zone)).name,
+            'health_area': (await HealthArea.findById(report.health_area)).name,
+            'village': (await Village.findById(report.village)).name,
+            'date': new Date(report.date).toLocaleDateString(),
 
-                // Diseases Treated (Traitement)
-                'onchocerciasis', 'lymphatic_filariasis', 'schistosomiasis', 'soil_transmitted_helminthiasis',
-                'trachoma', 
+            'MDD_start_date': new Date(report.MDD_start_date).toLocaleDateString(),
+            'MDD_end_date': new Date(report.MDD_end_date).toLocaleDateString(),
+            'distributors': report.distributors,
+            'patients': report.patients,
+            'households': report.households,
+            
+            'onchocerciasis': report.onchocerciasis,
+            'lymphatic_filariasis': report.lymphatic_filariasis,
+            'schistosomiasis': report.schistosomiasis,
+            'soil_transmitted_helminthiasis': report.soil_transmitted_helminthiasis,
+            'trachoma': report.trachoma,
 
-                // todo: treatment cycles: missing
-                'numTreatmentCycles',
+            'numTreatmentCycles': report.numTreatmentCycles,
 
-                'dcs_training_completion_date',
-                'medicines_arrival_date',
-                'date_of_transmission',
+            'dcs_training_completion_date': new Date(report.dcs_training_completion_date).toLocaleDateString(),
+            'medicines_arrival_date': new Date(report.medicines_arrival_date).toLocaleDateString(),
+            'date_of_transmission': new Date(report.date_of_transmission).toLocaleDateString(),
 
-                // morbidity
-                'blind',
-                'lymphedema',
-                'hydroceles',
-                'trichiasis',
-                'guinea_worm',
+            'blind': report.blind,
+            'lymphedema': report.lymphedema,
+            'hydroceles': report.hydroceles,
+            'trichiasis': report.trichiasis,
+            'guinea_worm': report.guinea_worm,
 
-                // Processing
-                'mectizan',
-                'mectizan_and_albendazole',
-                'albendazole',
-                'praziquantel',
-                'albendazole_soil_transmitted',
-                'side_effects_num',
+            'mectizan': report.mectizan,
+            'mectizan_and_albendazole': report.mectizan_and_albendazole,
+            'albendazole': report.albendazole,
+            'praziquantel': report.praziquantel,
+            'albendazole_soil_transmitted': report.albendazole_soil_transmitted,
+            'side_effects_num': report.side_effects_num,
 
-                        
-                //untreated persons
-                'untreated_persons',
+            'untreated_persons': report.untreated_persons,
 
-
-                // drug management
-                'ivermectin_management',
-                'albendazole_management',
-                'praziquantel_management',
-    ];
+            'ivermectin_management': report.ivermectin_management,
+            'albendazole_management': report.albendazole_management,
+            'praziquantel_management': report.praziquantel_management,
+        }
+    }
 
     try {
-        await Report.find({...findParams}).exec().then(function(docs) {
+        await Report.find({...findParams}).exec().then( async (docs) => {
             for (i in docs) {
-                reports.push(docs[i]._doc)
+                var report = await customOrderAndDereference(docs[i]._doc)
+                reports.push(report)
             }
 
             // todo:
             // replace references to health_area, health_zone, and village with their names
             // replace references to submitter with their names
         });
-
-        // order fields in custom order
-        reports = JSON.parse(JSON.stringify(reports, fields));
 
         converter.json2csv(reports, (err, csv) => {
             if (err) {
