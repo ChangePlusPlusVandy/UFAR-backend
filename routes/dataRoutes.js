@@ -127,15 +127,17 @@ dataRouter.get('/locations', (req, res) => {
 /**
  * @api {post} /data/download_forms
  */
- dataRouter.get('/download_forms', (req, res) => {
+ dataRouter.post('/download_forms', async (req, res) => {
 
     // verify user
-    /*
+
+    console.log("user", req.user);
+    console.log("body", req.body);
+    
     if (!req.user) {
         res.status(401).send("Unauthorized user error");
         return;
     }
-    */
 
     res.statusCode = 200;
     res.type('text/csv');
@@ -145,9 +147,17 @@ dataRouter.get('/locations', (req, res) => {
     // Header to force download
     res.setHeader('Content-disposition', 'attachment; filename=Report.csv');
 
+    const params = {
+        date: {
+            $gte: new Date(req.body.startDate),
+            $lte: new Date(req.body.endDate)
+        },
+        healthZoneId: req.user.user.health_zone.id,
+        is_validated: true
+    }
 
     // call helper function to handle request
-    functions.getFormsAsCSV(req.body, res);
+    functions.getFormsAsCSV(params, res);
 });
 
 module.exports = dataRouter;

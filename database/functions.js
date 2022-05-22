@@ -235,13 +235,15 @@ const getFormsAsCSV = async function(findParams = {}, res) {
     // change order of fields to order of fields in the form
     var fields = ['DMM_day', 'province', 'health_zone', 'health_area', 'village', 'date', 
     
-                // todo: treatment cycles: missing
 
                 'MDD_start_date', 'MDD_end_date', 'distributors', 'patients', 'households', 
 
                 // Diseases Treated (Traitement)
                 'onchocerciasis', 'lymphatic_filariasis', 'schistosomiasis', 'soil_transmitted_helminthiasis',
                 'trachoma', 
+
+                // todo: treatment cycles: missing
+                'numTreatmentCycles',
 
                 'dcs_training_completion_date',
                 'medicines_arrival_date',
@@ -273,42 +275,33 @@ const getFormsAsCSV = async function(findParams = {}, res) {
                 'praziquantel_management',
     ];
 
-    await Report.find({}).exec().then(function(docs) {
+    try {
+        await Report.find({...findParams}).exec().then(function(docs) {
+            for (i in docs) {
+                reports.push(docs[i]._doc)
+            }
 
-        for (i in docs) {
-            reports.push(docs[i]._doc)
-            // todo: reports.push(JSON.parse(JSON.stringify(docs[i]._doc, fields)))
-        }
+            // todo:
+            // replace references to health_area, health_zone, and village with their names
+            // replace references to submitter with their names
+        });
 
-        // todo:
-        // replace references to health_area, health_zone, and village with their names
-        // replace references to submitter with their names
+        // order fields in custom order
+        reports = JSON.parse(JSON.stringify(reports, fields));
 
-      // Report.csvReadStream(docs).pipe(writeStream);
-    });
+        converter.json2csv(reports, (err, csv) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send(err);
+            } else {
+                res.status(200).send(csv);
+            }
+        });
 
-   
-
-    // var opts = {
-    //     fields
-    //     // https://www.npmjs.com/package/json-2-csv
-    //     // exceludeKeys - specify keys to exclude from the csv (sent_to_kobo, _v)
-    // };
-
-
-    // converter.json2csv(reports, opts, function(err, csv) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     res.setHeader('Content-disposition', 'attachment; filename=reports.csv');
-    //     res.set('Content-Type', 'text/csv');
-    //     res.status(200).send(csv);
-    // });
-
-    converter.json2csv(reports, (err, csv) => {
-        console.log("CSV File generated");
-        res.status(200).send(csv);
-    });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
 }
 
 // helper function for the drug data dashboard
@@ -625,4 +618,4 @@ const editTrainingForm = async function(req) {
     }
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm, getFormsAsCSV };
