@@ -178,48 +178,134 @@ const addReport = async function(req, callback) {
  */
 const getForms = function(health_zone_id, validation_status, callback, user="") {
 
-    // first we get the healthzone's villages
-    HealthZone.findOne({'_id': health_zone_id}).exec((err, result) => {
-
-        if (err == null) {
-            if (!result) {
-                callback({
-                    message: "Could not find health zone with id " + health_zone_id
-                }, {});
-                return;
-            }
-
-            var findParams = {
-                "health_zone": result._id
-            };
-        
-            if (validation_status == "validated") findParams['is_validated'] = true;
-            if (validation_status == "unvalidated") findParams['is_validated'] = false;
-            if (user != "") {
-                if (user instanceof String) {
-                    user = mongoose.Types.ObjectId(user);
-                }
-                findParams['submitter'] = mongoose.Types.ObjectId(user);
-            }
-        
-            Report.find(findParams).exec(callback);   
-        } else {
-            callback("Error getting villages from health zone: " + err, result);
-        }
-    });   
-
-    /*
-    Code if we're storing health zone and health area in report (best search performance):
-
     var findParams = {
         health_zone: health_zone_id,
     };
 
     if (validation_status == "validated") findParams.push({'is_validated': true});
     if (validation_status == "unvalidated") findParams.push({'is_validated': false});
+    if (user != "") {
+        if (user instanceof String) {
+            user = mongoose.Types.ObjectId(user);
+        }
+        findParams['submitter'] = mongoose.Types.ObjectId(user);
+    }
 
     Report.find(findParams).exec(callback);   
-    */
+    
+}
+
+function flatten(obj) {
+    var empty = true;
+    if (obj instanceof Array) {
+        str = '[';
+        empty = true;
+        for (var i=0;i<obj.length;i++) {
+            empty = false;
+            str += flatten(obj[i])+', ';
+        }
+        return (empty?str:str.slice(0,-2))+']';
+    } else if (obj instanceof Object) {
+        str = '{';
+        empty = true;
+        for (i in obj) {
+            empty = false;
+            str += i+'->'+flatten(obj[i])+', ';
+        }
+        return (empty?str:str.slice(0,-2))+'}';
+    } else {
+        return obj; // not an obj, don't stringify me
+    }
+}
+
+const Json2csvParser = require("json2csv").Parser;
+const fs = require("fs");
+const { time } = require('console');
+
+// writeStream = fs.createWriteStream('exports/reports-' + Date.now() + '.csv')
+const getFormsAsCSV = async function(findParams = {}, res) {
+
+    // from https://www.bezkoder.com/node-js-export-mongodb-csv-file/
+
+    let converter = require('json-2-csv');
+
+    let reports = []
+
+   
+    const customOrderAndDereference = async (report) => {
+
+        return {
+            'DMM_day': new Date(report.DMM_day).toLocaleDateString(),
+            'province': (await Province.findById(report.province)).name,
+            'health_zone': (await HealthZone.findById(report.health_zone)).name,
+            'health_area': (await HealthArea.findById(report.health_area)).name,
+            'village': (await Village.findById(report.village)).name,
+            'date': new Date(report.date).toLocaleDateString(),
+
+            'MDD_start_date': new Date(report.MDD_start_date).toLocaleDateString(),
+            'MDD_end_date': new Date(report.MDD_end_date).toLocaleDateString(),
+            'distributors': report.distributors,
+            'patients': report.patients,
+            'households': report.households,
+            
+            'onchocerciasis': report.onchocerciasis,
+            'lymphatic_filariasis': report.lymphatic_filariasis,
+            'schistosomiasis': report.schistosomiasis,
+            'soil_transmitted_helminthiasis': report.soil_transmitted_helminthiasis,
+            'trachoma': report.trachoma,
+
+            'numTreatmentCycles': report.numTreatmentCycles,
+
+            'dcs_training_completion_date': new Date(report.dcs_training_completion_date).toLocaleDateString(),
+            'medicines_arrival_date': new Date(report.medicines_arrival_date).toLocaleDateString(),
+            'date_of_transmission': new Date(report.date_of_transmission).toLocaleDateString(),
+
+            'blind': report.blind,
+            'lymphedema': report.lymphedema,
+            'hydroceles': report.hydroceles,
+            'trichiasis': report.trichiasis,
+            'guinea_worm': report.guinea_worm,
+
+            'ivermectine': report.ivermectine,
+            'ivermectine_and_albendazole': report.ivermectine_and_albendazole,
+            'albendazole': report.albendazole,
+            'praziquantel': report.praziquantel,
+            'albendazole_soil_transmitted': report.albendazole_soil_transmitted,
+            'side_effects_num': report.side_effects_num,
+
+            'untreated_persons': report.untreated_persons,
+
+            'ivermectin_management': report.ivermectin_management,
+            'albendazole_management': report.albendazole_management,
+            'praziquantel_management': report.praziquantel_management,
+        }
+    }
+
+    try {
+        await Report.find({...findParams}).exec().then( async (docs) => {
+            for (i in docs) {
+                var report = await customOrderAndDereference(docs[i]._doc)
+                reports.push(report)
+            }
+
+            // todo:
+            // replace references to health_area, health_zone, and village with their names
+            // replace references to submitter with their names
+        });
+
+        converter.json2csv(reports, (err, csv) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send(err);
+            } else {
+                res.status(200).send(csv);
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+    }
 }
 
 // helper function for the drug data dashboard
@@ -536,4 +622,4 @@ const editTrainingForm = async function(req) {
     }
 }
 
-module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm };
+module.exports = { addReport, getLocationData, getForms, formatLocationData, getDrugData, getTherapeuticCoverage, getGeographicalCoverage, addTrainingForm, editTrainingForm, getFormsAsCSV };

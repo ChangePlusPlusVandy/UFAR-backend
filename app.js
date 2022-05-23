@@ -6,11 +6,13 @@ const authRouter = require('./routes/authRoutes');
 const formRouter = require('./routes/formRoutes');
 const dataRouter = require('./routes/dataRoutes');
 const validationRouter = require('./routes/validationRoutes');
+const functions = require('./database/functions');
 //const testEndPoint = require('./routes/GetUsersTest');
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
+
 
 const authMiddleware = expressJWT({
         secret: process.env.JWT_SECRET,
