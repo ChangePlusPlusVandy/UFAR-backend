@@ -266,8 +266,8 @@ const getFormsAsCSV = async function(findParams = {}, res) {
             'trichiasis': report.trichiasis,
             'guinea_worm': report.guinea_worm,
 
-            'mectizan': report.mectizan,
-            'mectizan_and_albendazole': report.mectizan_and_albendazole,
+            'ivermectine': report.ivermectine,
+            'ivermectine_and_albendazole': report.ivermectine_and_albendazole,
             'albendazole': report.albendazole,
             'praziquantel': report.praziquantel,
             'albendazole_soil_transmitted': report.albendazole_soil_transmitted,
