@@ -48,7 +48,7 @@ dataRouter.get('/locations', (req, res) => {
     // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function
-    functions.getTherapeuticCoverage(health_zone_id, 30, (result, err) => {
+    functions.getTherapeuticCoverage(health_zone_id, req.body.startDate, req.body.endDate, (result, err) => {
         // todo: ask stake holders (if dmm day or monthly) and integrate into this
         if (err == null) {
             console.log("Found and returned " + result);
@@ -80,7 +80,7 @@ dataRouter.get('/locations', (req, res) => {
     // http://localhost:3000/data/618b21eb8453970bd916764c/therapeutic_coverage
 
     // call helper function
-    functions.getGeographicalCoverage(health_zone_id, 30, (result, err) => {
+    functions.getGeographicalCoverage(health_zone_id, req.body.startDate, req.body.endDate, (result, err) => {
         if (err == null) {
             console.log("Found and returned " + result);
             res.status(200).send(result);
@@ -110,7 +110,7 @@ dataRouter.get('/locations', (req, res) => {
     console.log("Received request for drug proportion data from health zone with id: " + health_zone_id);
 
     // call helper function
-    functions.getDrugData(health_zone_id, 31).then(data => {
+    functions.getDrugData(health_zone_id, req.body.startDate, req.body.endDate).then(data => {
         if (data.error != null) {
             console.log("Error getting drug data for health zone: " + data.error);
             res.status(500).send({

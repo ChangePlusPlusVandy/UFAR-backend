@@ -309,7 +309,7 @@ const getFormsAsCSV = async function(findParams = {}, res) {
 }
 
 // helper function for the drug data dashboard
-const getDrugData = async function(health_zone_id, numPastDays) { 
+const getDrugData = async function(health_zone_id, startDate, endDate) { 
     try {
         if (!isValidObjectId(health_zone_id)) {
             return {result: null, error: {message: "Health zone id is not valid."}};
@@ -318,11 +318,7 @@ const getDrugData = async function(health_zone_id, numPastDays) {
         // drugData object will hold the drug data
         const drugData = {};
 
-        
-        const earliestDate = new Date();
-        earliestDate.setDate(earliestDate.getDate() - numPastDays);
-
-        const reports = await Report.find({ health_zone: health_zone_id, is_validated: true, 'date': {'$gte': new Date(earliestDate)} });
+        const reports = await Report.find({ health_zone: health_zone_id, is_validated: true, 'date': {'$gte': new Date(startDate), '$lte': new Date(endDate)} });
 
         if (reports.length != 0) {
 
@@ -384,7 +380,7 @@ const getDrugData = async function(health_zone_id, numPastDays) {
     }
 }
 
-const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
+const getTherapeuticCoverage = async function(health_zone_id, startDate, endDate, callback) {
 
     if (!isValidObjectId(health_zone_id)) {
         callback(null, {message: "Health zone id is not valid."});
@@ -394,11 +390,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     var reports
 
     try {
-        const current = new Date();
-        const prior = current.setDate(current.getDate() - time);
-
-        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } } ).exec();
-
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'date': {'$gte': new Date(startDate), '$lte': new Date(endDate)} } ).exec();
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
         return;
@@ -495,7 +487,7 @@ const getTherapeuticCoverage = async function(health_zone_id, time, callback) {
     return;
 }
 
-const getGeographicalCoverage = async function(health_zone_id, time, callback) {
+const getGeographicalCoverage = async function(health_zone_id, startDate, endDate, callback) {
 
     if (!isValidObjectId(health_zone_id)) {
         callback(null, {message: "Health zone id is not valid."});
@@ -505,13 +497,7 @@ const getGeographicalCoverage = async function(health_zone_id, time, callback) {
     var reports
 
     try {
-        const current = new Date();
-        const prior = current.setDate(current.getDate() - time);
-
-        console.log(new Date(prior))
-
-        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'MDD_start_date': {'$gte': new Date(prior) } }).exec();
-
+        reports = await Report.find( {'health_zone': health_zone_id, is_validated: true, 'date': {'$gte': new Date(startDate), '$lte': new Date(endDate)} }).exec();
         console.log("Waiting for report " + reports.length);
     } catch(err) {
         callback(null, "Error getting villages from health zone: " + err);
