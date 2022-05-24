@@ -476,11 +476,11 @@ const getTherapeuticCoverage = async function(health_zone_id, startDate, endDate
             finalResults["albendazole"][area] = 0
         }
 
-
-        finalResults["ivermectine"][area] += value["ivermectine"] / (value["enumerated_persons"] || 1) * 100 // avoid division by zero
-        finalResults["ivermectine_and_albendazole"][area] += value["ivermectine_and_albendazole"] / (value["enumerated_persons"] || 1) * 100
-        finalResults["albendazole"][area] += value["albendazole"] / (value["enumerated_children"] || 1) * 100
-        finalResults["praziquantel"][area] += value["praziquantel"] / (value["enumerated_children"] || 1) * 100
+        // round all to 1 decimal place
+        finalResults["ivermectine"][area] += Math.round(value["ivermectine"] / (value["enumerated_persons"] || 1) * 100 * 10) / 10 // avoid division by zero
+        finalResults["ivermectine_and_albendazole"][area] += Math.round(value["ivermectine_and_albendazole"] / (value["enumerated_persons"] || 1) * 100 * 10)/10
+        finalResults["albendazole"][area] += Math.round(value["albendazole"] / (value["enumerated_children"] || 1) * 100 * 10)/10
+        finalResults["praziquantel"][area] += Math.round(value["praziquantel"] / (value["enumerated_children"] || 1) * 100 * 10)/10
     }
 
     callback(finalResults, null);
@@ -556,7 +556,7 @@ const getGeographicalCoverage = async function(health_zone_id, startDate, endDat
 
     // go through each health area and compute percent treated
     for (const [area, value] of Object.entries(results)) {
-        finalResults[area] = value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length) * 100
+        finalResults[area] = Math.round(value['treated_villages'].length / (value['treated_villages'].length + value['untreated_villages'].length) * 100 * 10) / 10
     }
 
     callback(finalResults, null);
