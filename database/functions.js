@@ -182,8 +182,8 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
         health_zone: health_zone_id,
     };
 
-    if (validation_status == "validated") findParams.push({'is_validated': true});
-    if (validation_status == "unvalidated") findParams.push({'is_validated': false});
+    if (validation_status == "validated") findParams.is_validated = true;
+    if (validation_status == "unvalidated") findParams.is_validated = false;
     if (user != "") {
         if (user instanceof String) {
             user = mongoose.Types.ObjectId(user);
@@ -192,7 +192,6 @@ const getForms = function(health_zone_id, validation_status, callback, user="") 
     }
 
     Report.find(findParams).exec(callback);   
-    
 }
 
 function flatten(obj) {
