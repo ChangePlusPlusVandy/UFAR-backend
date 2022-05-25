@@ -6,7 +6,6 @@ const authRouter = require('./routes/authRoutes')
 const formRouter = require('./routes/formRoutes')
 const dataRouter = require('./routes/dataRoutes')
 const validationRouter = require('./routes/validationRoutes')
-// const testEndPoint = require('./routes/GetUsersTest');
 
 const PORT = process.env.PORT || 3001
 

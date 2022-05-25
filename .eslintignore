@@ -5,6 +5,7 @@ connect_mongo.bat
 .eslintrc.yml
 package.json
 package-lock.json
+node_modules/
 
 locations.txt
 buildreportplugin.py
