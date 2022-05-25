@@ -1,4 +1,5 @@
 .env
+.github
 README.md
 LICENSE
 connect_mongo.bat
