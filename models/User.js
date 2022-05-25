@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   name: {
@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   },
   role: { // 0: nurse, 1: manager, 2: accessor (with access code)
     type: String,
-    default: 'normal'
+    default: "normal"
   },
   password: {
     type: String,
@@ -20,8 +20,8 @@ const UserSchema = new Schema({
   },
   health_zone: {
     type: Schema.Types.ObjectId,
-    ref: 'HealthZone'
+    ref: "HealthZone"
   }
-})
+});
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model("User", UserSchema);

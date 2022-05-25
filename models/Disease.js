@@ -1,11 +1,11 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const DiseaseSchema = new Schema({
 
   report: {
     type: Schema.Types.ObjectId,
-    ref: 'Report',
+    ref: "Report",
     required: true
   },
 
@@ -19,6 +19,6 @@ const DiseaseSchema = new Schema({
     default: 0,
     required: true
   }
-})
+});
 
-module.exports = mongoose.model('Disease', DiseaseSchema)
+module.exports = mongoose.model("Disease", DiseaseSchema);

@@ -1,20 +1,22 @@
-const Country = require('../models/Country')
+const Country = require("../models/Country");
 
 new Country({
-  name: 'Test Country'
-}).save()
+  name: "Test Country"
+}).save();
 
 const parseTreatmentCycles = (req) => {
-  const result = {}
+  const result = {};
 
   for (const [key, value] of Object.entries(req)) {
-    result[key] = value
+    result[key] = value;
   }
 
-  return result
-}
+  return result;
+};
 
-console.log(parseTreatmentCycles({
-  key: 2,
-  key2: 'sun'
-}))
+console.log(
+  parseTreatmentCycles({
+    key: 2,
+    key2: "sun"
+  })
+);

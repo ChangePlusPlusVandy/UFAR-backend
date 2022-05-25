@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const ReportSchema = new Schema({
   // IDENTIFICATION
@@ -17,29 +17,29 @@ const ReportSchema = new Schema({
 
   submitter: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
 
   village: {
     type: Schema.Types.ObjectId,
-    ref: 'Village'
+    ref: "Village"
   },
 
   province: {
     type: Schema.Types.ObjectId,
-    ref: 'Province'
+    ref: "Province"
   },
 
   // This can be derived from village but caching it is easier for other queries
   health_area: {
     type: Schema.Types.ObjectId,
-    ref: 'HealthArea'
+    ref: "HealthArea"
   },
 
   // This can be derived from village but caching it is easier for other queries
   health_zone: {
     type: Schema.Types.ObjectId,
-    ref: 'HealthZone'
+    ref: "HealthZone"
   },
 
   date: {
@@ -516,6 +516,6 @@ const ReportSchema = new Schema({
     type: Boolean,
     default: false
   }
-})
+});
 
-module.exports = mongoose.model('Report', ReportSchema)
+module.exports = mongoose.model("Report", ReportSchema);

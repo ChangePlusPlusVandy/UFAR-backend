@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const TrainingFormSchema = new Schema({
   date: {
@@ -31,13 +31,13 @@ const TrainingFormSchema = new Schema({
 
     reportingProvince: {
       type: Schema.Types.ObjectId,
-      ref: 'Province',
+      ref: "Province",
       required: false
     },
 
     coordinatingProvince: {
       type: Schema.Types.ObjectId,
-      ref: 'Province',
+      ref: "Province",
       required: false
     },
 
@@ -396,6 +396,6 @@ const TrainingFormSchema = new Schema({
       default: Date.now()
     }
   }
-})
+});
 
-module.exports = mongoose.model('TrainingForm', TrainingFormSchema)
+module.exports = mongoose.model("TrainingForm", TrainingFormSchema);

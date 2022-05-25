@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const HealthZoneSchema = new Schema({
   name: {
@@ -9,13 +9,13 @@ const HealthZoneSchema = new Schema({
 
   health_areas: [{
     type: Schema.Types.ObjectId,
-    ref: 'HealthArea'
+    ref: "HealthArea"
   }],
 
   created_at: {
     type: Date,
     default: Date.now
   }
-})
+});
 
-module.exports = mongoose.model('HealthZone', HealthZoneSchema, 'HealthZone')
+module.exports = mongoose.model("HealthZone", HealthZoneSchema, "HealthZone");

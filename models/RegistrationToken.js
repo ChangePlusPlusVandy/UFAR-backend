@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const RegistrationTokenSchema = new Schema({
   token: {
@@ -12,7 +12,7 @@ const RegistrationTokenSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'Normal'
+    default: "Normal"
   },
   used: {
     type: Boolean,
@@ -20,8 +20,8 @@ const RegistrationTokenSchema = new Schema({
   },
   health_zone: {
     type: Schema.Types.ObjectId,
-    ref: 'HealthZone'
+    ref: "HealthZone"
   }
-})
+});
 
-module.exports = mongoose.model('Registration', RegistrationTokenSchema, 'Registration')
+module.exports = mongoose.model("Registration", RegistrationTokenSchema, "Registration");

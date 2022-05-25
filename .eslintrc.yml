@@ -7,5 +7,7 @@ extends:
 parserOptions:
   ecmaVersion: latest
 rules: {
-  camelcase: off
+  camelcase: off,
+  semi: [2, "always"],
+  quotes: [2, "double"],
 }
