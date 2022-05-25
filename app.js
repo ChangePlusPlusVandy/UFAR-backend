@@ -12,9 +12,9 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 
 const authMiddleware = expressJWT({
-  secret: process.env.JWT_SECRET,
-  algorithms: ["HS256"],
-  credentialsRequired: false
+	secret: process.env.JWT_SECRET,
+	algorithms: ["HS256"],
+	credentialsRequired: false
 });
 
 // connect database
@@ -32,9 +32,9 @@ app.use("/data", authMiddleware, dataRouter);
 app.use("/validation", authMiddleware, validationRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello World, this is UFAR");
+	res.send("Hello World, this is UFAR");
 });
 
 app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+	console.log(`Server started on port ${PORT}`);
 });
