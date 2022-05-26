@@ -10,7 +10,7 @@ const ObjectId = mongoose.Types.ObjectId;
 // checks if a string is a valid mongodb ObjectId or not
 const isValidObjectId = (id) => {
 	if (ObjectId.isValid(id)) {
-		if ((String)(new ObjectId(id)) === id) return true;
+		if (String(new ObjectId(id)) === id) return true;
 		return false;
 	}
 	return false;
@@ -19,16 +19,18 @@ const isValidObjectId = (id) => {
 // this is actually unneeded bc it literally just returns its param copied
 
 const getLocationData = function (callback) {
-	Province.find({}).populate({
-		path: "health_zones",
-		populate: {
-			path: "health_areas",
+	Province.find({})
+		.populate({
+			path: "health_zones",
 			populate: {
-				path: "villages",
-				model: "Village"
+				path: "health_areas",
+				populate: {
+					path: "villages",
+					model: "Village"
+				}
 			}
-		}
-	}).exec(callback);
+		})
+		.exec(callback);
 };
 
 /**
@@ -51,13 +53,14 @@ const formatLocationData = function (locationData) {
 
 			health_zone.health_areas.forEach((health_area) => {
 				new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name] = {};
-				new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].id =
-				health_area._id;
-				new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].villages =
-				{};
+				// eslint-disable-next-line max-len
+				new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].id = health_area._id;
+				// eslint-disable-next-line max-len
+				new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].villages = {};
 				health_area.villages.forEach((village) => {
-					// eslint-disable-next-line max-len
-					new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].villages[village.name] = village._id;
+					new_structure[province.name].health_zones[health_zone.name].health_areas[health_area.name].villages[
+						village.name
+					] = village._id;
 				});
 			});
 		});
@@ -119,8 +122,10 @@ const addReport = async function (req, callback) {
 	}
 
 	// check if rawBody._id is a valid object id
-	if (mongoose.Types.ObjectId.isValid(rawBody._id) &&
-		(String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
+	if (
+		mongoose.Types.ObjectId.isValid(rawBody._id) &&
+		String(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id
+	) {
 		// We are updating an existing document
 
 		let parsedId = rawBody._id;
@@ -131,14 +136,6 @@ const addReport = async function (req, callback) {
 
 		const result = await Report.findByIdAndUpdate(parsedId, rawBody, { new: true });
 
-		/*
-		Report.updateMany({ _id: parsedId }, { $set: { "Changed": true } }).catch(
-			error => {
-				console.log("Error updating form: " + error.message);
-				callback(null, error)
-			}
-		); */
-
 		console.log("Form updated ww/ id " + rawBody._id);
 
 		callback(result, null);
@@ -146,13 +143,16 @@ const addReport = async function (req, callback) {
 		// Create new doc
 		const formDoc = new Report(req.body);
 
-		formDoc.save().then(result => {
-			console.log("new form inserted");
-			callback(result, null);
-		}).catch(err => {
-			console.log("Error saving form: " + err.message);
-			callback(null, err);
-		});
+		formDoc
+			.save()
+			.then((result) => {
+				console.log("new form inserted");
+				callback(result, null);
+			})
+			.catch((err) => {
+				console.log("Error saving form: " + err.message);
+				callback(null, err);
+			});
 	}
 };
 
@@ -237,12 +237,14 @@ const getFormsAsCSV = async function (findParams = {}, res) {
 	};
 
 	try {
-		await Report.find({ ...findParams }).exec().then(async (docs) => {
-			for (const i in docs) {
-				const report = await customOrderAndDereference(docs[i]._doc);
-				reports.push(report);
-			}
-		});
+		await Report.find({ ...findParams })
+			.exec()
+			.then(async (docs) => {
+				for (const i in docs) {
+					const report = await customOrderAndDereference(docs[i]._doc);
+					reports.push(report);
+				}
+			});
 
 		converter.json2csv(reports, (err, csv) => {
 			if (err) {
@@ -262,7 +264,10 @@ const getFormsAsCSV = async function (findParams = {}, res) {
 const getDrugData = async function (health_zone_id, startDate, endDate) {
 	try {
 		if (!isValidObjectId(health_zone_id)) {
-			return { result: null, error: { message: "Health zone id is not valid." } };
+			return {
+				result: null,
+				error: { message: "Health zone id is not valid." }
+			};
 		}
 
 		// drugData object will hold the drug data
@@ -275,8 +280,11 @@ const getDrugData = async function (health_zone_id, startDate, endDate) {
 		});
 
 		if (reports.length !== 0) {
-			const allHealthAreas =
-			await HealthZone.find({ _id: health_zone_id }).populate({ path: "health_areas" }).exec();
+			const allHealthAreas = await HealthZone.find({
+				_id: health_zone_id
+			})
+				.populate({ path: "health_areas" })
+				.exec();
 
 			// console.log("health areas:", allHealthAreas[0]["health_areas"]);
 
@@ -314,13 +322,16 @@ const getDrugData = async function (health_zone_id, startDate, endDate) {
 				// and update drugData object
 				drugData[healthArea.name] = {};
 				for (let i = 0; i < drugsName.length; i++) {
-					const drugPercentage = Math.round(drugsUsed[i] / (drugsReceived[i] || 1) * 100);
+					const drugPercentage = Math.round((drugsUsed[i] / (drugsReceived[i] || 1)) * 100);
 					drugData[healthArea.name][drugsName[i]] = drugPercentage;
 				}
 
 				// remove a health area if it has no data
-				if (drugData[healthArea.name].albendazole === 0 &&
-					drugData[healthArea.name].praziquantel === 0 && drugData[healthArea.name].ivermectin === 0) {
+				if (
+					drugData[healthArea.name].albendazole === 0 &&
+					drugData[healthArea.name].praziquantel === 0 &&
+					drugData[healthArea.name].ivermectin === 0
+				) {
 					delete drugData[healthArea.name];
 				}
 			}
@@ -344,8 +355,7 @@ const getTherapeuticCoverage = async function (health_zone_id, startDate, endDat
 	let reports;
 
 	try {
-		reports =
-		await Report.find({
+		reports = await Report.find({
 			health_zone: health_zone_id,
 			is_validated: true,
 			date: { $gte: new Date(startDate), $lte: new Date(endDate) }
@@ -363,32 +373,32 @@ const getTherapeuticCoverage = async function (health_zone_id, startDate, endDat
 		const patients = rep.patients;
 
 		const enumerated_persons =
-					patients.men.lessThanSixMonths +
-					patients.men.sixMonthsToFiveYears +
-					patients.men.fiveToFourteen +
-					patients.men.fifteenAndAbove +
-					patients.women.lessThanSixMonths +
-					patients.women.sixMonthsToFiveYears +
-					patients.women.fiveToFourteen +
-					patients.women.fifteenAndAbove;
+			patients.men.lessThanSixMonths +
+			patients.men.sixMonthsToFiveYears +
+			patients.men.fiveToFourteen +
+			patients.men.fifteenAndAbove +
+			patients.women.lessThanSixMonths +
+			patients.women.sixMonthsToFiveYears +
+			patients.women.fiveToFourteen +
+			patients.women.fifteenAndAbove;
 
-		const enumerated_children =
-					patients.men.fiveToFourteen +
-					patients.women.fiveToFourteen;
+		const enumerated_children = patients.men.fiveToFourteen + patients.women.fiveToFourteen;
 
-		const ivermectine = rep.ivermectine.men.fiveToFourteen + rep.ivermectine.men.fifteenAndOver +
-							rep.ivermectine.women.fiveToFourteen + rep.ivermectine.women.fifteenAndOver;
+		const ivermectine =
+			rep.ivermectine.men.fiveToFourteen +
+			rep.ivermectine.men.fifteenAndOver +
+			rep.ivermectine.women.fiveToFourteen +
+			rep.ivermectine.women.fifteenAndOver;
 
-		const ivermectine_and_albendazole = rep.ivermectine_and_albendazole.men.fiveToFourteen +
-										rep.ivermectine_and_albendazole.men.fifteenAndOver +
-										rep.ivermectine_and_albendazole.women.fiveToFourteen +
-										rep.ivermectine_and_albendazole.women.fifteenAndOver;
+		const ivermectine_and_albendazole =
+			rep.ivermectine_and_albendazole.men.fiveToFourteen +
+			rep.ivermectine_and_albendazole.men.fifteenAndOver +
+			rep.ivermectine_and_albendazole.women.fiveToFourteen +
+			rep.ivermectine_and_albendazole.women.fifteenAndOver;
 
-		const albendazole = rep.albendazole.men.fiveToFourteen +
-						rep.albendazole.women.fiveToFourteen;
+		const albendazole = rep.albendazole.men.fiveToFourteen + rep.albendazole.women.fiveToFourteen;
 
-		const praziquantel = rep.praziquantel.men.fiveToFourteen +
-						rep.praziquantel.women.fiveToFourteen;
+		const praziquantel = rep.praziquantel.men.fiveToFourteen + rep.praziquantel.women.fiveToFourteen;
 
 		if (!(health_area in results)) {
 			results[health_area] = {
@@ -431,18 +441,18 @@ const getTherapeuticCoverage = async function (health_zone_id, startDate, endDat
 			finalResults.albendazole[area] = 0;
 		}
 
-		// round all to 1 decimal place
-		finalResults.ivermectine[area] +=
-		Math.round(value.ivermectine / (value.enumerated_persons || 1) * 100 * 10) / 10; // avoid division by zero
+		// round all to 1 decimal place and avoid division by 0
+		// eslint-disable-next-line max-len
+		finalResults.ivermectine[area] += Math.round((value.ivermectine / (value.enumerated_persons || 1)) * 100 * 10) / 10;
 
 		finalResults.ivermectine_and_albendazole[area] +=
-		Math.round(value.ivermectine_and_albendazole / (value.enumerated_persons || 1) * 100 * 10) / 10;
+			Math.round((value.ivermectine_and_albendazole / (value.enumerated_persons || 1)) * 100 * 10) / 10;
 
 		finalResults.albendazole[area] +=
-		Math.round(value.albendazole / (value.enumerated_children || 1) * 100 * 10) / 10;
+			Math.round((value.albendazole / (value.enumerated_children || 1)) * 100 * 10) / 10;
 
 		finalResults.praziquantel[area] +=
-		Math.round(value.praziquantel / (value.enumerated_children || 1) * 100 * 10) / 10;
+			Math.round((value.praziquantel / (value.enumerated_children || 1)) * 100 * 10) / 10;
 	}
 
 	callback(finalResults, null);
@@ -483,14 +493,15 @@ const getGeographicalCoverage = async function (health_zone_id, startDate, endDa
 		const health_area = (await HealthArea.findById(health_area_id).exec()).name;
 		const village = rep.village;
 
-		const treated = rep.onchocerciasis.first_round > 0 ||
-					rep.onchocerciasis.second_round > 0 ||
-					rep.lymphatic_filariasis.ivermectine_and_albendazole > 0 ||
-					rep.lymphatic_filariasis.albendazole_alone.first_round > 0 ||
-					rep.lymphatic_filariasis.albendazole_alone.second_round > 0 ||
-					rep.schistosomiasis > 0 ||
-					rep.soil_transmitted_helminthiasis > 0 ||
-					rep.trachoma > 0;
+		const treated =
+			rep.onchocerciasis.first_round > 0 ||
+			rep.onchocerciasis.second_round > 0 ||
+			rep.lymphatic_filariasis.ivermectine_and_albendazole > 0 ||
+			rep.lymphatic_filariasis.albendazole_alone.first_round > 0 ||
+			rep.lymphatic_filariasis.albendazole_alone.second_round > 0 ||
+			rep.schistosomiasis > 0 ||
+			rep.soil_transmitted_helminthiasis > 0 ||
+			rep.trachoma > 0;
 
 		console.log("Report found with vill " + village + " and treated status " + treated);
 
@@ -520,8 +531,10 @@ const getGeographicalCoverage = async function (health_zone_id, startDate, endDa
 	// go through each health area and compute percent treated
 	for (const [area, value] of Object.entries(results)) {
 		finalResults[area] =
-		Math.round(value.treated_villages.length /
-		(value.treated_villages.length + value.untreated_villages.length) * 100 * 10) / 10;
+			Math.round(
+				// eslint-disable-next-line max-len
+				(value.treated_villages.length / (value.treated_villages.length + value.untreated_villages.length)) * 100 * 10
+			) / 10;
 	}
 
 	callback(finalResults, null);
@@ -551,8 +564,10 @@ const editTrainingForm = async function (req) {
 	try {
 		const rawBody = req.body;
 
-		if (mongoose.Types.ObjectId.isValid(rawBody._id) &&
-		(String)(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id) {
+		if (
+			mongoose.Types.ObjectId.isValid(rawBody._id) &&
+			String(new mongoose.Types.ObjectId(rawBody._id)) === rawBody._id
+		) {
 			let parsedId = rawBody._id;
 
 			if (parsedId instanceof String) {
@@ -563,7 +578,10 @@ const editTrainingForm = async function (req) {
 
 			return { result: editedForm, error: null };
 		} else {
-			return { result: null, error: { message: "Training Form id is not valid." } };
+			return {
+				result: null,
+				error: { message: "Training Form id is not valid." }
+			};
 		}
 	} catch (err) {
 		return { result: null, error: err };

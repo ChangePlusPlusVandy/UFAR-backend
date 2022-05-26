@@ -22,11 +22,7 @@ validationRouter.post("/reports/validate", async (req, res) => {
 
 	try {
 		const id = mongoose.Types.ObjectId(req.body._id);
-		const validatedReport = await Report.findByIdAndUpdate(
-			id,
-			{ is_validated: true },
-			{ new: true }
-		);
+		const validatedReport = await Report.findByIdAndUpdate(id, { is_validated: true }, { new: true });
 		res.status(200).send(validatedReport);
 	} catch (err) {
 		console.log("Error occurred when validating report: " + err.message);

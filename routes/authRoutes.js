@@ -161,9 +161,7 @@ authRouter.post("/newuuid", async function (req, res) {
 		})
 		.catch((err) => {
 			res.status(500).send({
-				message:
-          err.message ||
-          "Some error occurred while creating the new UUID token."
+				message: err.message || "Some error occurred while creating the new UUID token."
 			});
 		});
 });
@@ -215,15 +213,12 @@ authRouter.post("/update_password", async function (req, res) {
 	// https://www.npmjs.com/package/bcrypt
 	// to check pw, bcrypt.compareSync(myPlaintextPassword, hash); // true
 
-	await User.updateOne({ name: username }, { $set: { password: hash } }).catch(
-		(error) => {
-			console.log(error);
-			res.status(500).send({
-				message:
-          error.message || "Some error occurred while updating the User."
-			});
-		}
-	);
+	await User.updateOne({ name: username }, { $set: { password: hash } }).catch((error) => {
+		console.log(error);
+		res.status(500).send({
+			message: error.message || "Some error occurred while updating the User."
+		});
+	});
 
 	res.status(201).send("User updated successfully.");
 });

@@ -7,10 +7,12 @@ const HealthAreaSchema = new Schema({
 		required: true
 	},
 
-	villages: [{
-		type: Schema.Types.ObjectId,
-		ref: "Village"
-	}]
+	villages: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "Village"
+		}
+	]
 });
 
 module.exports = mongoose.model("HealthArea", HealthAreaSchema, "HealthArea");

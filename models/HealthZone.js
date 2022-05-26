@@ -7,10 +7,12 @@ const HealthZoneSchema = new Schema({
 		required: true
 	},
 
-	health_areas: [{
-		type: Schema.Types.ObjectId,
-		ref: "HealthArea"
-	}],
+	health_areas: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "HealthArea"
+		}
+	],
 
 	created_at: {
 		type: Date,

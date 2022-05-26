@@ -49,8 +49,7 @@ formRouter.post("/insertTrainingForm", (req, res) => {
 		.catch((err) => {
 			console.log("Error inserting training form: " + err.message);
 			res.status(500).send({
-				message:
-          err.message || "Some error occurred while inserting training form."
+				message: err.message || "Some error occurred while inserting training form."
 			});
 		});
 });
@@ -65,9 +64,7 @@ formRouter.get("/:reportingProvince_id/getTrainingForms", (req, res) => {
 		return;
 	}
 
-	const reportingProvince_id = mongoose.Types.ObjectId(
-		req.params.reportingProvince_id
-	);
+	const reportingProvince_id = mongoose.Types.ObjectId(req.params.reportingProvince_id);
 
 	TrainingForm.find({ reportingProvince: reportingProvince_id })
 		.then((result) => {
@@ -77,8 +74,7 @@ formRouter.get("/:reportingProvince_id/getTrainingForms", (req, res) => {
 		.catch((err) => {
 			console.log("Error retrieving training forms: " + err.message);
 			res.status(500).send({
-				message:
-          err.message || "Some error occurred while retrieving training forms."
+				message: err.message || "Some error occurred while retrieving training forms."
 			});
 		});
 });
@@ -98,9 +94,7 @@ formRouter.post("/editTrainingForm", (req, res) => {
 		if (data.error != null) {
 			console.log("Error editing training form: " + data.error.message);
 			res.status(500).send({
-				message:
-          data.error.message ||
-          "Some error occurred while editing training form."
+				message: data.error.message || "Some error occurred while editing training form."
 			});
 		} else {
 			console.log("Edited training form with id " + req.body._id);

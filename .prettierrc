@@ -1,0 +1,6 @@
+{
+	"useTabs": true,
+	"prettier/prettier": "warn",
+	"trailingComma": "none",
+	"printWidth": 120
+}

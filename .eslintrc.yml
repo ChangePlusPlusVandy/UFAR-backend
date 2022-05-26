@@ -4,13 +4,14 @@ env:
   es2021: true
 extends:
   - standard
+  - plugin:prettier/recommended
 parserOptions:
   ecmaVersion: latest
 rules: {
   camelcase: off,
-  semi: [2, "always"],
-  quotes: [2, "double"],
-  max-len: [2, { code: 120 }],
-  indent: [2, "tab"],
+  semi: [1, "always"],
+  quotes: [1, "double"],
+  max-len: [1, { code: 120 }],
+  indent: [1, "tab"],
   no-tabs: 0,
 }

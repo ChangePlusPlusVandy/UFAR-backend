@@ -11,16 +11,17 @@ const ProvinceSchema = new Schema({
 		required: true
 	},
 
-	health_zones: [{
-		type: Schema.Types.ObjectId,
-		ref: "HealthZone"
-	}],
+	health_zones: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "HealthZone"
+		}
+	],
 
 	created_at: {
 		type: Date,
 		default: Date.now
 	}
-
 });
 
 module.exports = mongoose.model("Province", ProvinceSchema, "Province");
