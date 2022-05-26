@@ -1,5 +1,6 @@
 .env
 .github
+.vscode
 README.md
 LICENSE
 connect_mongo.bat

@@ -1,5 +1,7 @@
 .env
 .github
+.vscode
+.prettierrc
 README.md
 LICENSE
 connect_mongo.bat
