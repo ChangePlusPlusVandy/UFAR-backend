@@ -35,6 +35,12 @@ const TrainingFormSchema = new Schema({
 			required: false
 		},
 
+		reportingHealthZone: {
+			type: Schema.Types.ObjectId,
+			ref: "HealthZone",
+			required: true
+		},
+
 		coordinatingProvince: {
 			type: Schema.Types.ObjectId,
 			ref: "Province",
