@@ -132,7 +132,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 * Carol He - nicholas.s.gebo@vanderbilt.edu
 * Asher Sabah - asher.e.sabah@vanderbilt.edu
 
-Project Link: [https://github.com/ChangePlusPlusVandy/UFAR-frontend](https://github.com/ChangePlusPlusVandy/UFAR-frontend)
+Project Link: [https://github.com/ChangePlusPlusVandy/UFAR-backend](https://github.com/ChangePlusPlusVandy/UFAR-backend)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
