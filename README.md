@@ -107,7 +107,6 @@ Ensure you have the latest version of [NPM](https://www.npmjs.com/) installed.
    ```sh
    npm start
    ```
-4. Follow the instructions in the terminal or the web browser to view the application in a simulator or on your mobile device
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
